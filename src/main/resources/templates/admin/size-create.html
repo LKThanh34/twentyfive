@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+</head>
+<body>
+<div layout:fragment="content">
+
+  <h4>Thông tin cỡ</h4>
+  <form th:object="${Size}" method="post" th:action="${action}" id="size-form">
+    <div class="my-3">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label>Mã cỡ</label>
+          <span class="red_require"> *</span>
+          <input type="text" class="form-control" th:field="*{code}" placeholder="Nhập mã cỡ">
+          <span class="error"></span>
+        </div>
+        <div class="form-group col-md-6">
+          <label>Tên cỡ</label>
+          <span class="red_require"> *</span>
+          <input type="text" class="form-control" th:field="*{name}" placeholder="Nhập tên cỡ">
+          <span class="error"></span>
+
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary m-1"><i class="fa ti-save"></i> Lưu lại
+      </button>
+
+      <a href="/admin/size-all" class="btn btn-secondary m-1"><i class="fa fa-mail-reply (alias)"></i> <span>Hủy bỏ</span></a>
+
+    </div>
+  </form>
+  <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+  <script>
+    $(document).ready(function () {
+      Validator({
+        form: '#size-form',
+        formGroupSelector: '.form-group',
+        errorSelector: '.error',
+        rules: [
+          Validator.isRequired('#code', 'Vui lòng nhập mã kích cỡ'),
+          Validator.isRequired('#name', 'Vui lòng nhập tên kích cỡ'),
+          Validator.maxLength('#name', 30),
+          Validator.maxLength('#code', 20),
+        ]
+      });
+    })
+  </script>
+</div>
+</body>
+</html>

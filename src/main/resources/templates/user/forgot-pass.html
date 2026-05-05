@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{user/layout-user.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Title page -->
+        <section class="bg-img1 txt-center p-lr-15 p-tb-92" style="background-image: url('images/bg-02.jpg');">
+            <h2 class="ltext-105 cl0 txt-center">
+                Quên mật khẩu
+            </h2>
+        </section>
+
+        <!-- Content page -->
+        <section class="bg0 p-b-60">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-4">
+                        <div th:if="${errorMessage}" class="alert alert-danger">
+                            <p th:text="${errorMessage}"></p>
+                        </div>
+                        <form class="mt-5 px-4 pt-4 pb-6 shadow-sm border" th:action="@{/reset-page}" method="post" id="login-form">
+
+                            <div class="form-group">
+                                <label for="email">Nhập email của bạn để đặt lại mật khẩu</label>
+                                <input type="text" class="form-control" id="email" name="email" placeholder="Địa chỉ email">
+                                <span class="error text-danger text-sm"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Đặt lại mật khẩu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Back to top -->
+        <div class="btn-back-to-top" id="myBtn">
+		<span class="symbol-btn-back-to-top">
+			<i class="zmdi zmdi-chevron-up"></i>
+		</span>
+        </div>
+
+    </div>
+</body>
+</html>

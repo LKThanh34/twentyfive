@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{user/layout-user.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" style="z-index: 3000">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Chọn mã giảm giá</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="overflow-y:auto; max-height: 400px ">
+                    <th:block th:each="voucher : ${discountCodes}">
+                        <div th:data-voucher-id="${voucher.id}"  class="d-flex border border-primary rounded align-items-center cursor-pointer voucher-item mb-2">
+                            <div class="col-sm-3 d-flex justify-content-center align-items-center " style="background-color: rgb(219 234 254); height: 80px">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12.79 21L3 11.21v2c0 .53.21 1.04.59 1.41l7.79 7.79c.78.78 2.05.78 2.83 0l6.21-6.21c.78-.78.78-2.05 0-2.83L12.79 21z"></path><path fill="currentColor" d="M11.38 17.41c.78.78 2.05.78 2.83 0l6.21-6.21c.78-.78.78-2.05 0-2.83L12.63.58A2.04 2.04 0 0 0 11.21 0H5C3.9 0 3 .9 3 2v6.21c0 .53.21 1.04.59 1.41l7.79 7.79zM7.25 3a1.25 1.25 0 1 1 0 2.5a1.25 1.25 0 0 1 0-2.5z"></path></svg>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="w-full">
+                                    <p class="font-weight-bold amount-dis">Giảm
+                                        <span th:if="${voucher.type == 2}" th:text="${#numbers.formatDecimal(voucher.discountAmount, 0, 'POINT', 0, 'COMMA') + ' VND'}"></span>
+                                        <span th:if="${voucher.type == 1}" th:text="${voucher.percentage} + '%'"></span>
+                                    </p>
+                                    <div>
+                                     <span class="mr-4 amount-mini" th:text="${'Cho đơn từ ' + #numbers.formatDecimal(voucher.minimumAmountInCart, 0, 'POINT', 0, 'COMMA') + ' VND'}">
+                                     </span>
+                                        <span class="amount-max" th:if="${voucher.type == 1}" th:text="'Giảm tối đa ' + ${#numbers.formatDecimal(voucher.maximumAmount, 0, 'POINT', 0, 'COMMA') + ' VND'}"></span>
+                                    </div>
+
+                                    <div class="d-flex align-items-center ">
+                                        <span class="mr-2 text-sm text-gray-600" th:text="${'HSD: ' + #dates.format(voucher.endDate, 'dd/MM/yyyy')}">: [[]</span>
+                                        <!--                                    <span class="text-sm text-gray-600 d-flex">-->
+                                        <!--                                        <span>Còn: </span>-->
+                                        <!--                                        <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>-->
+                                        <!--                                    </span>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- breadcrumb -->
+    <div class="container">
+        <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+            <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+                Home
+                <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+            </a>
+
+            <span class="stext-109 cl4">
+					Shoping Cart
+				</span>
+        </div>
+    </div>
+
+    <!-- Shoping Cart -->
+    <form class="bg0 p-t-75 p-b-85">
+        <div class="container">
+            <div class="">
+                <div class=" m-b-50">
+                    <div class="">
+                        <div th:if="${carts.size() == 0}" class="d-flex flex-column align-items-center">
+                            <img src="https://i.imgur.com/dCdflKN.png" width="130" height="130" class="img-fluid mb-4 mr-3">
+                            <h3><strong>Giỏ hàng hiện tại trống</strong></h3>
+                            <a th:href="@{/getproduct}" class="btn btn-primary cart-btn-transform m-3" data-abc="true">Tiếp tục mua sắm</a>
+                        </div>
+                        <div class="wrap-table-shopping-cart">
+
+                            <table class="table-shopping-cart" th:if="${carts.size() > 0}">
+
+                                <tr class="table_head">
+                                    <th class="column-3 ml-2">Ảnh</th>
+                                    <th class="column-2">Tên</th>
+                                    <th class="column-3">Đơn giá</th>
+                                    <th class="column-1">Cỡ</th>
+                                    <th class="column-1">Màu</th>
+                                    <th class="column-4">Số lượng</th>
+                                    <th class="column-5">Tổng</th>
+                                </tr>
+                                <tr class="table-row product-item" th:each="cart : *{carts}">
+                                    <input type="hidden" th:value="${cart.id}" class="cartId">
+                                    <input type="hidden" th:value="${cart.detail.id}" class="detailId">
+                                    <td class="column-3">
+                                        <div class="how-itemcart1 ml-2">
+                                            <img th:src="@{'/' + ${cart.product.imageUrl}}" alt="IMG">
+                                        </div>
+                                    </td>
+                                    <td class="column-3" th:text="${cart.product.name}"></td>
+                                    <td class="column-3" >
+                                        <span class="product-old-price" th:if="${cart.detail.discountedPrice != null}" th:text="${#numbers.formatDecimal(cart.detail.price, 0, 'POINT', 0, 'COMMA')}" style="text-decoration: line-through; font-size: 12px"></span>
+                                        <span class="product-price" th:if="${cart.detail.discountedPrice != null}" th:text="${#numbers.formatDecimal(cart.detail.discountedPrice, 0, 'POINT', 0, 'COMMA')}"></span>
+                                        <span class="product-price" th:if="${cart.detail.discountedPrice == null}" th:text="${#numbers.formatDecimal(cart.detail.price, 0, 'POINT', 0, 'COMMA')}"></span>
+                                    </td>
+                                    <td class="column-1" th:text="${cart.detail.size.name}"></td>
+                                    <td class="column-1" th:text="${cart.detail.color.name}"></td>
+                                    <td class="column-4">
+                                        <div class="wrap-num-product flex-w m-l-auto m-r-0">
+                                            <div class="btn-num-product-down js-update-cart-down cl8 hov-btn3 trans-04 flex-c-m">
+                                                <i class="fs-16 zmdi zmdi-minus"></i>
+                                            </div>
+
+                                            <input class="mtext-104 cl3 txt-center num-product" type="number"
+                                                   th:name="'num-product'+${cart.id}" th:value="${cart.quantity}">
+
+                                            <div class="btn-num-product-up js-update-cart-up cl8 hov-btn3 trans-04 flex-c-m">
+                                                <i class="fs-16 zmdi zmdi-plus"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="column-5 total-money"></td>
+                                </tr>
+
+                            </table>
+                        </div>
+
+                        <span class="d-inline-block p-t-18 p-b-15 p-l-2 btn-choose-voucher" data-toggle="modal" data-target="#exampleModalCenter">
+
+                                <span class="font-weight-bold">
+                                    <i class="fa fa-tags" aria-hidden="true"></i>
+                                    Chọn mã giảm giá
+                                </span>
+<!--                            <div-->
+<!--                                    class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">-->
+<!--                                Update Cart-->
+<!--                            </div>-->
+                        </span>
+                        <div id="selected-voucher" class="p-l-2" data-selected="">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class=" m-b-50">
+                <div class="bor10 p-lr-40 p-t-30 p-b-40">
+                    <h4 class="mtext-109 cl2 p-b-30">
+                        Thông tin đơn hàng
+                    </h4>
+                    <div class="flex-w flex-t bor12 p-b-13">
+                        <div class="size-208">
+									<span class="stext-110 cl2">
+										Tổng tiền:
+									</span>
+                        </div>
+
+                        <div class="size-209">
+									<span class="mtext-110 cl2" id="sub-total">
+
+									</span>
+                        </div>
+                    </div>
+
+                    <div class="flex-w flex-t bor12 p-t-15 p-b-30">
+                        <div class="size-208 w-full-ssm">
+									<span class="stext-110 cl2">
+										Shipping:
+									</span>
+                        </div>
+
+                        <div class="size-209 p-r-18 p-r-0-sm w-full-ssm">
+                            <!--                                <p class="stext-111 cl6 p-t-2">-->
+                            <!--                                    There are no shipping methods available. Please double check your address, or-->
+                            <!--                                    contact us if you need any help.-->
+                            <!--                                </p>-->
+                            <div class="p-t-15 addressArea">
+										<span class="stext-112 cl8">
+											Chọn địa chỉ
+										</span>
+                                <div class="address-list pt-15">
+                                    <div th:if="${addressShippings.size() > 0}" class="pt-15">
+                                        <div th:each="address : *{addressShippings}" class="shipping-choose">
+                                            <div th:id="'shipping' + ${address.id}">
+                                                <p th:text="${address.address}"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="bg2 size-102" id="add-address">Thêm địa chỉ +</button>
+                                <!--                                    -->
+                                <div id="address-select-group" style="display: none">
+<!--                                    <div class="rs1-select2 rs2-select2 bor8 bg0 m-b-12 m-t-9">-->
+<!--                                        <select class="js-select2" name="province" id="province">-->
+
+<!--                                        </select>-->
+<!--                                        <div class="dropDownSelect2"></div>-->
+<!--                                    </div>-->
+                                   
+
+                                  
+
+                                    <div class="bor8 bg0 m-b-12">
+                                        <input class="stext-111 cl8 plh3 size-111 p-lr-15" type="text" name="street" id="street"
+                                               placeholder="Số nhà, đường, xóm">
+                                    </div>
+                                    <span class="stext-111 errorStreet" style="color: red; display: none">Vui lòng nhập số nhà, đường, xóm</span>
+                                    <div>
+                                        <button class="bg2 size-102 hov-btn3" type="button" id="save-address-btn">Lưu</button>
+                                        <button class="bor8 size-102" type="button" id="cancel-add-address">Bỏ qua</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+<!--                    <div class="flex-w flex-t bor12 p-t-15 p-b-30">-->
+<!--                        <div class="size-208 w-full-ssm">-->
+<!--									<span class="stext-110 cl2">-->
+<!--										Phí ship:-->
+<!--									</span>-->
+
+<!--                        </div>-->
+<!--                        <div class="size-209">-->
+<!--									<span class="mtext-110 cl2">-->
+<!--                                        0 VND-->
+<!--									</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="flex-w flex-t bor12 p-t-15 p-b-30">
+                        <div class="size-208 w-full-ssm">
+									<span class="stext-110 cl2">
+										Voucher:
+									</span>
+
+                        </div>
+                        <div class="size-209">
+									<span class="mtext-110 cl2" id="voucher-pic">
+                                        0 VND
+									</span>
+                        </div>
+                    </div>
+                    <div class="flex-w flex-t p-t-27 p-b-33">
+                        <div class="size-208">
+									<span class="mtext-101 cl2">
+										Thành tiền:
+									</span>
+                        </div>
+
+                        <div class="size-209 p-t-1">
+									<span class="mtext-110 cl2" id="all-total">
+
+									</span>
+                        </div>
+                    </div>
+                    <div class="flex-w flex-t p-t-27 p-b-33">
+                        <div class="size-208">
+									<span class="mtext-101 cl2">
+										Phương thức thanh toán:
+									</span>
+                        </div>
+
+                        <div class="size-209 p-t-1">
+                            <div class="form-group">
+                                <input type="radio" class="custom-radio" value="3" name="paymentMethod" id="payment-online" checked>
+                                <label for="payment-online">Chuyển khoản</label>
+                            </div>
+                            <div class="form-group">
+                                <input type="radio" class="custom-radio" value="1" name="paymentMethod" id="payment-offline">
+                                <label for="payment-offline">Tiền mặt</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <span class="text-danger font-weight-bold" style="font-size: 20px">Lưu ý: Chỉ ship trong khu vực Hà Nội, phí ship khách tự trả</span>
+                    </div>
+                    <label class="checkbox d-flex">
+                        <input type="checkbox" class="mr-2" id="term">
+                        Tôi đồng ý với <a style="color: blue" data-toggle="modal" data-target="#exampleModalCenter2">&nbsp; điều khoản &nbsp</a> của cửa hàng
+                    </label>
+                    <button type="button" id="submitBtn" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer" disabled>
+                        Đặt hàng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="modal fade" style="z-index: 3000" id="exampleModalCenter2" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" style="max-width24: 100%">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="font-size: px; font-weight: bold">Điều khoản</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>1.	Người mua đã thanh toán bằng cách phương thức thanh toán hợp lệ nhưng không nhận được sản phẩm, sản phẩm bị lỗi hoặc bị hư hại, sai sản phẩm, không ưng ý.</p>
+                    <p>2.	Có thể gửi yêu cầu trả hàng/hoàn tiền trong vòng 7 ngày kể từ lúc đơn hàng được cập nhật giao hàng thành công.</p>
+                    <p>3.	Tất cả các yêu cầu trả hànghoàn tiền phải được thực hiện trên web hoặc liên hệ trực tiếp tới cửa hàng</p>
+                    <p>4.	Phí gửi hàng lại do người mua trả</p>
+                    <p>5.	Mỗi hóa đơn chỉ được đổi trả 1 lần</p>
+                    <p>6.	Chỉ hỗ trợ đổi size, đổi màu, đổi sản phẩm bằng hoặc hơn giá</p>
+                    <p>7.	Người mua đóng gói và gửi trả sản phẩm bao gồm toàn bộ phụ kiện đi kèm, hóa đơn, tem phiếu bảo hành (nếu có) và sản phẩm phải trong tình trạng nguyên vẹn như khi nhận hàng.</p>
+                    <p>8.	Người mua bắt buộc phải quay video hoặc chụp lại ảnh sản phẩm ngay khi nhận được và trong lúc đóng gói hàng trả về để làm bằng chứng đối chiếu/khiếu nại về sau.</p>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Back to top -->
+    <div class="btn-back-to-top" id="myBtn">
+		<span class="symbol-btn-back-to-top">
+			<i class="zmdi zmdi-chevron-up"></i>
+		</span>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" th:inline="javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            var voucherList = /*[[${discountCodes}]]*/ ''
+            var voucherChoosed;
+
+            $('.how-itemcart1').on('click', function () {
+                var cartId = $(this).parent().parent().find('.cartId').val()
+                Swal.fire({
+                    title: 'Xóa sản phẩm',
+                    text: 'Bạn chắc chắc muốn xóa sản phẩm này khỏi giỏ hàng?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Hủy',
+                    confirmButtonText: 'Xác nhận',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: 'POST',
+                            url: `http://localhost:8080/api/deleteCart/${cartId}`,
+                            success: function (data) {
+
+                            }
+                        })
+
+                        $(this).parent().parent().remove()
+                        calculateTotal();
+
+                        var currentQua = parseInt(localStorage.getItem("cartQuantity"))
+                        $(".js-show-cart").attr("data-notify", currentQua - 1)
+                    }
+                });
+
+
+            })
+            // var addressSelected = {
+            //     street: '',
+            //     ward: '',
+            //     district: '',
+            //     province: '',
+            // }
+
+            var addressSelected = {
+                street: '',
+                ward: '',
+                district: '',
+                province: 'Hà Nội',
+
+            }
+
+            var province = []
+            var district = []
+            var ward = []
+
+            $(".shipping-choose").on('click', function () {
+                $(".shipping-choose").removeClass('active')
+                $(this).addClass('active')
+            })
+
+            $("#add-address").on('click', function () {
+                $("#address-select-group").show()
+                $("#add-address").hide()
+            })
+
+            $("#save-address-btn").on('click', function () {
+
+                // const province = $("#province").val()
+                const district = $("#district").val()
+                const ward = $("#ward").val();
+                const street = $("#street").val().trim()
+                if (district == "" || ward == "" || street == "") {
+                    swal("Lỗi", "Vui lòng nhập đầy đủ địa chỉ")
+                }else {
+                    addressSelected.street = street
+                    var dataSend = {
+                        address: Object.entries(addressSelected)
+                            .filter(([key, value]) => value !== null && value !== '')
+                            .map(([key, value]) => value)
+                            .join(', ')
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        contentType: "application/json; charset=utf-8",
+                        url: `api/public/addressShipping`,
+                        data: JSON.stringify(dataSend),
+                        success: function (data) {
+                            const content = `
+                                           <div class="shipping-choose">
+                                               <div id="shipping${data.id}">
+                                                   <p>${data.address}</p>
+                                               </div>
+                                           </div>
+                                       </div>`
+
+                            $('.address-list').append(content)
+                            $(".shipping-choose").on('click', function () {
+                                $(".shipping-choose").removeClass('active')
+                                $(this).addClass('active')
+                            })
+                        },
+                        error: function (xhr, status, error) {
+                            $('#loading-overlay').hide();
+                            swal("Lỗi", xhr.responseJSON.message, "error")
+                        }
+                    })
+                    $("#add-address").show()
+                    $("#address-select-group").hide()
+                }
+            })
+
+            $("#cancel-add-address").on('click', function () {
+                $("#add-address").show()
+                $("#address-select-group").hide()
+            })
+            // $.ajax({
+            //     type: 'GET',
+            //     dataType: "json",
+            //     url: `https://vapi.vnappmob.com/api/province/`,
+            //     success: function (data) {
+            //         province = data.results.map(item => ({ value: item.province_id, label: item.province_name }))
+            //         loadProvinceSelect(data)
+            //     }
+            // })
+
+            $("#province").on('change', function () {
+                var provinceId = $(this).val()
+                if(provinceId == "") {
+                    $("#district").html('')
+                } else {
+                    const selectedOption = province.find((option) => option.value === provinceId)
+                    addressSelected.province = selectedOption.label
+                    $.ajax({
+                        type: 'GET',
+                        dataType: "json",
+                        url: `https://vapi.vnappmob.com/api/province/district/01`,
+                        success: function (data) {
+                            district = data.results.map(item => ({ value: item.district_id, label: item.district_name }))
+                            loadDistrictSelect(data)
+                        }
+                    })
+                }
+
+            })
+
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: `https://vapi.vnappmob.com/api/province/district/01`,
+                success: function (data) {
+                    district = data.results.map(item => ({ value: item.district_id, label: item.district_name }))
+                    loadDistrictSelect(data)
+                }
+            })
+
+            $("#district").on('change', function () {
+                var districtId = $(this).val()
+
+                if(districtId == "") {
+                    $("#ward").html('')
+                }else {
+                    const selectedOption = district.find((option) => option.value === districtId)
+                    addressSelected.district = selectedOption.label
+                    $.ajax({
+                        type: 'GET',
+                        dataType: "json",
+                        url: `https://vapi.vnappmob.com/api/province/ward/${districtId}`,
+                        success: function (data) {
+                            ward = data.results.map(item => ({ value: item.ward_id, label: item.ward_name }))
+                            loadWardSelect(data)
+                        }
+                    })
+                }
+
+            })
+
+            $("#ward").on('change', function () {
+                const selectedOption = ward.find((option) => option.value === $(this).val());
+                addressSelected.ward = selectedOption.label
+            })
+
+            function updateSubtotal(row) {
+                var quantity = parseInt(row.find(".num-product").val());
+                var price = parseFloat(removeAnyNonDigit(row.find('.product-price').text()));
+                var subtotal = quantity * price;
+                row.find('.total-money').text(formatNumber(subtotal) + ' VND');
+            }
+
+            function calculateVoucherPrice() {
+                if(voucherChoosed) {
+                    if(voucherChoosed.percentage) {
+                        var voucherPriceLast;
+                        var totalMoney = removeAnyNonDigit($('#sub-total').text())
+                        var value = parseFloat(totalMoney) * voucherChoosed.percentage / 100
+                        if(value > voucherChoosed.maximumAmount) {
+                            voucherPriceLast = voucherChoosed.maximumAmount
+                        }
+                        else {
+                            voucherPriceLast = Math.round(value)
+                        }
+                        $("#voucher-pic").text(formatNumber(voucherPriceLast))
+                    }else {
+                        if(voucherChoosed.discountAmount) {
+                            $("#voucher-pic").text(formatNumber(voucherChoosed.discountAmount))
+
+                        }
+                    }
+                }
+                else {
+                    $("#voucher-pic").text('0')
+
+                }
+            }
+
+            // Function to calculate the total money
+            function calculateTotal() {
+                var total = 0;
+                $('.table-row').each(function () {
+                    var subtotal = parseFloat($(this).find('.total-money').text().replace(/[^0-9]/g, ''));
+                    total += subtotal;
+                });
+                $('#sub-total').text(formatNumber(total) + ' VND');
+                $('#all-total').text(formatNumber(total - parseFloat(removeAnyNonDigit($("#voucher-pic").text()))) + ' VND')
+                calculateVoucherPrice()
+            }
+
+            // Calculate the initial total and update subtotals
+            $('.table-row').each(function () {
+                updateSubtotal($(this));
+            });
+            calculateTotal();
+
+            // When quantity is changed, update subtotal and recalculate total
+            $(".num-product").on('change', function () {
+                if($(this).val() > 20) {
+                    Swal.fire({
+                        text: 'Bạn chỉ mua được tối đa 20 sản phẩm',
+                        icon: 'error'
+                    })
+                    $(this).val(20)
+                }
+
+                $('#selected-voucher').html('')
+                $('#selected-voucher').attr('data-selected', "")
+                voucherChoosed = null
+                calculateVoucherPrice()
+
+
+                var row = $(this).closest('.table-row');
+                updateSubtotal(row);
+                calculateTotal();
+                updateToServer(row, $(this).val())
+
+                $('#selected-voucher').html('')
+                $('#selected-voucher').attr('data-selected', "")
+            });
+
+            $('.num-product').on('keypress', function (e) {
+                onlyAllowNumberInput(e)
+            })
+
+            $('.num-product').on('focusout', function (e) {
+                if($(this).val() == '') {
+                    $(this).val(1)
+                    $(this).trigger('change')
+                }
+            })
+
+            function onlyAllowNumberInput(e) {
+                const key = e.key;
+                if (key === '-' || key == 0) {
+                    e.preventDefault();
+                }
+            }
+
+
+                $('.btn-num-product-down').on('click', function(){
+                    var numProduct = Number($(this).next().val());
+// $(this).next().val(numProduct - 1)
+                    var row = $(this).closest('.table-row');
+                    $('#selected-voucher').html('')
+                    $('#selected-voucher').attr('data-selected', "")
+                    voucherChoosed = null
+                    calculateVoucherPrice()
+
+
+                        updateSubtotal(row);
+                        calculateTotal();
+                        updateToServer(row, row.find(".num-product").val())
+                });
+
+            $('.btn-num-product-up').on('click', function(){
+                // var numProduct = Number($(this).prev().val());
+                // $(this).prev().val(numProduct + 1);
+                var row = $(this).closest('.table-row');
+                if(row.find(".num-product").val() > 20) {
+                    Swal.fire({
+                        text: 'Bạn chỉ mua được tối đa 20 sản phẩm',
+                        icon: 'error'
+                    })
+                    row.find(".num-product").val(20)
+                    return
+                }
+                $('#selected-voucher').html('')
+                $('#selected-voucher').attr('data-selected', "")
+                voucherChoosed = null
+                calculateVoucherPrice()
+
+
+                updateSubtotal(row);
+                calculateTotal();
+                updateToServer(row, row.find(".num-product").val())
+
+            });
+
+            $(".voucher-item").on('click', function () {
+                var voucherId = $(this).attr('data-voucher-id')
+                voucherChoosed = voucherList.find(item => item.id == voucherId)
+                var amountDis = $(this).find('.amount-dis').text()
+                var amountMin = $(this).find('.amount-mini').text()
+                var amountMax = $(this).find('.amount-max').text()
+                if (parseFloat(voucherChoosed.minimumAmountInCart) > parseFloat(removeAnyNonDigit($('#sub-total').text()))) {
+                    swal("Voucher", "Giá trị đơn hàng không đủ để áp dụng voucher này", "error")
+                    return;
+                }
+                var html = `<div class="d-flex align-items-center border border-primary rounded" style="width: 300px">
+                                <div class="col-sm-3 d-flex justify-content-center align-items-center mr-2" style="background-color: rgb(219 234 254); height: 80px">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12.79 21L3 11.21v2c0 .53.21 1.04.59 1.41l7.79 7.79c.78.78 2.05.78 2.83 0l6.21-6.21c.78-.78.78-2.05 0-2.83L12.79 21z"></path><path fill="currentColor" d="M11.38 17.41c.78.78 2.05.78 2.83 0l6.21-6.21c.78-.78.78-2.05 0-2.83L12.63.58A2.04 2.04 0 0 0 11.21 0H5C3.9 0 3 .9 3 2v6.21c0 .53.21 1.04.59 1.41l7.79 7.79zM7.25 3a1.25 1.25 0 1 1 0 2.5a1.25 1.25 0 0 1 0-2.5z"></path></svg>
+                                </div>
+                                <div>
+                                    <h5 class="font-weight-bold">${amountDis}</h5>
+                                    <p>${amountMin}</p>
+                                    <span>${amountMax}</span>
+                                </div>
+                                <span id="remove-voucher" class="cursor-pointer ml-5">&times;</span>
+                            </div>`
+
+                $('#selected-voucher').html(html)
+                $('#selected-voucher').attr('data-selected', voucherId)
+                $("#remove-voucher").on('click', function () {
+                    $('#selected-voucher').attr('data-selected', "")
+                    $('#selected-voucher').html('')
+                    voucherChoosed = null
+                    calculateVoucherPrice()
+                    calculateTotal()
+                })
+
+                $('#exampleModalCenter').modal('hide')
+
+
+                calculateVoucherPrice()
+                calculateTotal()
+            })
+
+            var checkbox = $('#term');
+            var submitBtn = $('#submitBtn');
+
+            // Add event listener to the checkbox
+            checkbox.change(function () {
+                // Enable the button if the checkbox is checked, otherwise disable it
+                submitBtn.prop('disabled', !checkbox.prop('checked'));
+            });
+
+            // =============================HANDLE SUBMIT==============================
+            $("#submitBtn").on('click', async function () {
+                var voucherId = $("#selected-voucher").attr('data-selected')
+                var orderDetails = []
+                var promotion = removeAnyNonDigit($('#voucher-pic').text())
+                $(".product-item").each(function () {
+                    orderDetails.push({
+                        productDetailId: $(this).find(".detailId").val(),
+                        quantity: $(this).find(".num-product").val()
+                    })
+                })
+
+                if(orderDetails.length <= 0) {
+                    swal("Lỗi", "Giỏ hàng trống", "error")
+                    return;
+                }
+
+                if ($('.shipping-choose.active p').text().trim() == "") {
+                    swal("Thông báo", "Vui lòng chọn địa chỉ trước khi đặt hàng", "error")
+                    return;
+                }
+
+                var paymentMethodId = $('input[name="paymentMethod"]:checked').val();
+
+                const dataSend = {
+                    paymentMethodId: $('input[name="paymentMethod"]:checked').val(),
+                    billingAddress: $('.shipping-choose.active p').text().trim(),
+                    promotionPrice: promotion,
+                    voucherId: voucherId,
+                    orderDetailDtos: orderDetails
+                }
+
+                if(paymentMethodId == 3) {
+                    const amount = removeAnyNonDigit($('#all-total').text())
+                    // INIT PAYMENT
+                    await $.ajax({
+                        type: 'POST',
+                        dataTye: 'json',
+                        url: `/api/payment?amount=${amount}`,
+                        success: function (data) {
+                            sessionStorage.setItem("orderTemp", JSON.stringify(dataSend))
+                            window.location.href = data.url
+                        },
+                        error: function () {
+                            swal("Lỗi", "Xảy ra lỗi trong quá trình thanh toán", "error")
+                        }
+                    })
+                }
+                else  {
+                    $('#loading-overlay').show();
+                    await $.ajax({
+                        type: 'POST',
+
+                        url: '/api/orderUser',
+                        data: JSON.stringify(dataSend),
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            $('#loading-overlay').hide();
+                            Swal.fire({
+                                title: 'Đặt hàng',
+                                text: 'Đặt hàng thành công',
+                                icon: 'success',
+                                showCancelButton: true,
+                                confirmButtonText: 'Tiếp tục mua sắm',
+                                cancelButtonText: 'Hủy'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // Chuyển trang khi người dùng nhấn "OK"
+                                    window.location.href = '/getproduct';
+                                }
+                                else {
+                                    window.location.reload()
+                                }
+                            });
+
+                        },
+                        error: function (xhr, status, error) {
+                            $('#loading-overlay').hide();
+                            swal("Lỗi", xhr.responseJSON.message, "error")
+                        }
+                    })
+                }
+            })
+        })
+
+        function removeAnyNonDigit(value) {
+            return value.replace(/\D/g, '');
+        }
+
+
+        function formatNumber(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        var debounceTimer;
+        function updateToServer(row, quantity) {
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+            }
+            var dataSend = {
+                id: row.find(".cartId").val(),
+                quantity: quantity
+            }
+            debounceTimer = setTimeout(async function () {
+
+                await $.ajax({
+                    type: 'POST',
+                    url: '/api/updateCart',
+                    data: JSON.stringify(dataSend),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                    },
+                    error: function (xhr, status, error) {
+                        swal("Lỗi", xhr.responseJSON.message, "error")
+                        row.find(".num-product").val(1)
+                        updateToServer(row, 1)
+                    }
+
+                })
+            }, 500); // Adjust the delay as needed (e.g., 500 milliseconds)
+        }
+
+        function loadProvinceSelect(data) {
+            province = data.results.map(item => ({ value: item.province_id, label: item.province_name }))
+            var selectElement = document.getElementById("province");
+            selectElement.innerHTML = '';
+
+            var defaultOption = document.createElement("option");
+            defaultOption.text = "Choose province";
+            defaultOption.value = ""
+            selectElement.appendChild(defaultOption);
+
+            for (var i = 0; i < data.results.length; i++) {
+                var option = document.createElement("option");
+                    option.text = data.results[i].province_name;
+                option.value = data.results[i].province_id;
+                selectElement.appendChild(option);
+            }
+        }
+
+        function loadDistrictSelect(data) {
+            district = data.results.map(item => ({ value: item.district_id, label: item.district_name }))
+
+            var selectElement = document.getElementById("district");
+
+            selectElement.innerHTML = '';
+
+            var defaultOption = document.createElement("option");
+            defaultOption.text = "Chọn quận, huyện";
+            defaultOption.value = ""
+            selectElement.appendChild(defaultOption);
+
+            for (var i = 0; i < data.results.length; i++) {
+                var option = document.createElement("option");
+                option.text = data.results[i].district_name;
+                option.value = data.results[i].district_id;
+                selectElement.appendChild(option);
+            }
+        }
+
+        function loadWardSelect(data) {
+            var selectElement = document.getElementById("ward");
+
+            selectElement.innerHTML = '';
+
+            var defaultOption = document.createElement("option");
+            defaultOption.text = "Chọn phường, xã";
+            defaultOption.value = ""
+            selectElement.appendChild(defaultOption);
+
+            for (var i = 0; i < data.results.length; i++) {
+                var option = document.createElement("option");
+                option.text = data.results[i].ward_name;
+                option.value = data.results[i].ward_id;
+                selectElement.appendChild(option);
+            }
+        }
+    </script>
+</div>
+<!--<div class="clearfix">-->
+<!--    <ul class="pagination">-->
+<!--        <li th:if="${items.hasPrevious()}" class="page-item">-->
+<!--            <a th:href="@{/getshop(page=0, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')}, productName=${productName})}"-->
+<!--               class="page-link">First</a>-->
+<!--        </li>-->
+<!--        <li th:if="${items.hasPrevious()}" class="page-item">-->
+<!--            <a th:href="@{/getshop(page=${items.number - 1}, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')}, productName=${productName})}"-->
+<!--               class="page-link">Previous</a>-->
+<!--        </li>-->
+<!--        <li th:if="${items.hasNext()}" class="page-item">-->
+<!--            <a th:href="@{/getshop(page=${items.number + 1}, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')}, productName=${productName})}"-->
+<!--               class="page-link">Next</a>-->
+<!--        </li>-->
+<!--        <li th:if="${items.hasNext()}" class="page-item">-->
+<!--            <a th:href="@{/getshop(page=${items.totalPages - 1}, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')}, productName=${productName})}"-->
+<!--               class="page-link">Last</a>-->
+<!--        </li>-->
+<!--    </ul>-->
+<!--</div>-->
+
+</body>
+</html>

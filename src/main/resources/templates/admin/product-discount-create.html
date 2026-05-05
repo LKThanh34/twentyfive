@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo giảm giá</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.1.1/flowbite.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.6.0/pagination.min.css" integrity="sha512-K1k7jSn9RDKEcn/ugqVVvWYu0bcS3q1w6m/5pQSnrj0bCfIqF6Wk49lkmckSb4wglvTP9V17LtS0q0XxYccXbg==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.4/jquery.simplePagination.min.js" integrity="sha512-J4OD+6Nca5l8HwpKlxiZZ5iF79e9sgRGSf0GxLsL1W55HHdg48AEiKCXqvQCNtA1NOMOVrw15DXnVuPpBm2mPg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.4/simplePagination.min.css" integrity="sha512-85KEMf8eFSgiFrs/gGSVg0S6JqrmCtvVcA+s1PTMl/qtqH0ucmhrYrAFXock7iSjCaVcCMUNgCEF+sdQBUp7pA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+
+            z-index: 2;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="overlay"></div>
+<!-- Main modal -->
+<div class="main-discount-create bg-gray-100 min-h-screen">
+    <div id="apply-all-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-1/4 translate-x-1/4 left-1/4 z-50 justify-center items-center w-full h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Thiết lập toàn bộ
+                    </h3>
+                    <button type="button" id="close-modal-apply-all" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" >
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5">
+                    <form class="space-y-4" id="apply-all-form">
+                        <div class="form-group">
+                            <label for="percentage-all" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Giảm giá(%)</label>
+                            <input type="text" name="percentage-all" id="percentage-all" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="%" >
+                            <span class="error text-red-500 text-sm"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="start-date-all" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ngày bắt đầu</label>
+                            <input type="date" name="start-date-all" id="start-date-all"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" >
+                            <span class="error text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="end-date-all" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ngày kết thúc</label>
+                            <input type="date" name="end-date-all" id="end-date-all" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" >
+                            <span class="error text-red-500 text-sm"></span>
+                        </div>
+
+                        <button id="apply-all-btn" type="button" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Áp dụng</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-4 py-4">
+        <div class="main-section pt-8">
+            <h5 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white">Tạo giảm
+                giá</h5>
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+                    <li class="inline-flex items-center">
+                        <a th:href="@{/admin}"
+                           class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                            <svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 fill="currentColor" viewBox="0 0 20 20">
+                                <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+                            </svg>
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m1 9 4-4-4-4"/>
+                            </svg>
+                            <a th:href="@{/admin-only/product-discount}"
+                               class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">Giảm
+                                giá sản phẩm</a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m1 9 4-4-4-4"/>
+                            </svg>
+                            <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">Tạo giảm giá</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="main-area bg-white py-2 px-2 mt-4 h-screen">
+
+                <form class="mt-4">
+                    <div class="flex">
+                        <label for="search-dropdown"
+                               class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Your Email</label>
+                        <button id="dropdown-button" data-dropdown-toggle="dropdown" class="flex-shrink-0 z- inline-flex items-center py-2.5 px-4 text-sm
+                            font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
+                                type="button">
+                            <span>Tất cả các loại</span>
+                            <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m1 1 4 4 4-4"/>
+                            </svg>
+                        </button>
+                        <div id="dropdown"
+                             class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
+                                <li>
+                                    <button type="button" data-category-id=""
+                                            class="category-item inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                        Tất cả các loại
+                                    </button>
+                                </li>
+                                <li th:each="category: ${categories}">
+                                    <button type="button" th:data-category-id="${category.id}"
+                                            class="category-item inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                            th:text="${category.name}"></button>
+                                </li>
+
+                            </ul>
+                        </div>
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                          stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                                </svg>
+                            </div>
+                            <input type="search" id="search-dropdown" class="block p-2.5 ps-8 w-80 z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700
+                                dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+                                   placeholder="Tìm kiếm sản phẩm" required>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="grid grid-cols-3 gap-2 mt-6">
+                        <div id="all-product" class="border border-gray-200">
+                        <div class="bg-zinc-50 border border-gray-200">
+                            <div class="flex justify-between">
+                                <span class="font-bold py-2 px-2">Danh sách sản phẩm</span>
+                                <span id="select-all" class="text-blue-500 py-2 px-2 cursor-pointer hover:text-blue-700">Chọn toàn bộ</span>
+                            </div>
+                        </div>
+                        <div class="bg-white list-product">
+                            <div class="product-item">
+                                <div class="product-item-inner flex justify-between items-center mb-4 mx-4 py-4 border-b border-blue-200">
+                                    <div class="product-info flex items-center">
+                                        <div class="w-12 h-16 mr-4">
+                                            <img src="https://static-images.vnncdn.net/files/publish/2022/9/3/bien-vo-cuc-thai-binh-346.jpeg"
+                                                 alt="">
+                                        </div>
+                                        <div>
+                                            <div>
+                                                <span class="font-bold">Áo phông trơn S.Cafe</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-400">
+                                                    <span>Barcode: </span>
+                                                    <span class="mr-2">12332432535</span>
+                                                    <span>Size: </span>
+                                                    <span class="mr-2">S</span>
+                                                    <span>Cỡ: </span>
+                                                    <span>M</span>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-400">Giá bán: </span>
+                                                <span class="font-bold">10.000đ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="cursor-pointer hover:text-blue-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                             viewBox="0 0 32 32">
+                                            <path fill="currentColor"
+                                                  d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3zm0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5zm-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5h-2z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="pagination-container" class="flex justify-end"></div>
+                    </div>
+                    <div id="selected-product" class="border border-gray-200 col-span-2">
+                        <div class="bg-zinc-50 border border-gray-200">
+                            <div class="flex justify-between">
+                                <span class="font-bold py-2 px-2">Sản phẩm đã chọn</span>
+                                <span id="open-modal-btn" class="text-blue-500 py-2 px-2 cursor-pointer hover:text-blue-700">Áp dụng tất cả</span>
+                                <span class="text-blue-500 py-2 px-2 cursor-pointer hover:text-blue-700" id="remove-all-select">Bỏ chọn toàn bộ</span>
+                            </div>
+                        </div>
+                        <div class="bg-white list-select-product">
+
+                        </div>
+                        <div id="pagination-select-container" class="flex justify-end"></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end items-center mt-6 space-x-2 pb-6 rtl:space-x-reverse">
+                    <button id="cancel-discount-btn" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Trở lại</button>
+                    <button id="save-discount-btn" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Lưu</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:src="@{/admin/assets/js/flowbite.min.js}"></script>
+<script type="module">
+    import { Modal } from '/admin/assets/js/flowbite.min'
+
+</script>
+<script th:src="@{/admin/assets/js/validator.js}"></script>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        var productListInit= []
+        var productListCurrent = []
+        var productSelectedList = []
+        var productSelectedListDetailId = []
+
+        $('#start-date-all').val(getCurrentDate())
+        $('#end-date-all').val(getLastDayOfMonth())
+
+        // Validator({
+        //     form: '#apply-all-form',
+        //     formGroupSelector: '.form-group',
+        //     errorSelector: '.error',
+        //     rules: [
+        //         Validator.isRequired('#percentage-all', 'Vui lòng nhập phần trăm giảm giá'),
+        //         Validator.isRequired('#start-date-all', 'Vui lòng nhập ngày bắt đầu'),
+        //         Validator.isRequired('#end-date-all', 'Vui lòng nhập ngày kết thúc'),
+        //     ],
+        //     onSubmit: function (data) {
+        //         const percent = $('#percentage-all').val()
+        //         const startDate = $("#start-date-all").val()
+        //         const endDate = $('#end-date-all').val()
+        //
+        //         $('.percentage').val(percent).trigger('input')
+        //         $('.startDate').val(startDate)
+        //         $('.endDate').val(endDate)
+        //         $('#apply-all-modal').hide()
+        //         $('#overlay').hide()
+        //     }
+        // });
+
+        $('#open-modal-btn').on('click', function () {
+            $('#apply-all-modal').show()
+            $('#overlay').show()
+        })
+
+        $('#close-modal-apply-all').on('click', function () {
+            $('#apply-all-modal').hide()
+            $('#overlay').hide()
+        })
+
+        $('#apply-all-form').on('submit', function () {
+            if($("#start-date-all").val() >= $('#end-date-all').val()) {
+                Swal.fire({text: 'Ngày bắt đầu phải nhỏ hơn ngày kết thúc', icon: 'error'})
+            }
+        })
+
+
+        $(".category-item").on('click', function () {
+            let categoryId = $(this).attr('data-category-id')
+            $('#dropdown-button span').text($(this).text())
+            $('#dropdown-button').attr('selected-id', categoryId)
+            $('#dropdown').removeClass('block')
+            $('#dropdown').addClass('hidden')
+            getListProduct($('#search-dropdown').val(), categoryId)
+        })
+
+        function onlyAllowNumberInput(e) {
+            const key = e.key;
+            if (!/[\d\b]/.test(key)) {
+                e.preventDefault();
+            }
+        }
+
+        function removeAnyNonDigit(value) {
+            return value.replace(/\D/g, '');
+        }
+
+
+         $.ajax({
+            method: 'GET',
+            type: 'json',
+            url: `/api/products-no-pagination/`,
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                productListInit = data
+                productListCurrent = productListInit
+                loadHtmlProduct(productListInit)
+                setInitChoosedFalse()
+                paginateProductList(productListInit)
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    title: "Lỗi",
+                    text: xhr.responseJSON.message,
+                    icon: "error"
+                });
+            }
+        })
+
+        function setInitChoosedFalse() {
+            productListInit.forEach(product => {
+                product.productDetailDtos.forEach(detail => {
+                    detail.choosed = false
+                })
+            });
+        }
+
+        function paginateProductList(productList) {
+            var items = $(".product-item");
+            var numItems = items.length;
+            var perPage = 5;
+
+            items.slice(perPage).hide();
+
+            $('#pagination-container').pagination({
+                items: numItems,
+                itemsOnPage: perPage,
+                cssStyle: "light-theme",
+                onPageClick: function (pageNumber) {
+                    var showFrom = perPage * (pageNumber - 1);
+                    var showTo = showFrom + perPage;
+                    items.hide().slice(showFrom, showTo).show();
+                }
+            });
+        }
+
+
+        function paginateSelectedProductList() {
+            var items = $(".product-select-item");
+            var numItems = items.length;
+            var perPage = 5;
+
+            items.slice(perPage).hide();
+
+            $('#pagination-select-container').pagination({
+                items: numItems,
+                itemsOnPage: perPage,
+                cssStyle: "light-theme",
+                onPageClick: function (pageNumber) {
+                    var showFrom = perPage * (pageNumber - 1);
+                    var showTo = showFrom + perPage;
+                    items.hide().slice(showFrom, showTo).show();
+                }
+            });
+        }
+
+        // const $targetEl = document.getElementById('authentication-modal');
+        // const instanceOptions = {
+        //     id: 'authentication-modal',
+        //     override: true
+        // };
+        // const modal = new Modal($targetEl);
+
+        //
+        $('#apply-all-btn').on('click', function () {
+            const percent = $('#percentage-all').val()
+            const startDate = $("#start-date-all").val()
+            const endDate = $('#end-date-all').val()
+
+            $('.percentage').val(percent).trigger('input')
+            $('.startDate').val(startDate)
+            $('.endDate').val(endDate)
+            $('#apply-all-modal').hide()
+            $('#overlay').hide()
+        })
+
+        $('#percentage-all').on('input', function () {
+            if($(this).val() > 98) {
+                $(this).val(98);
+                Toastify({
+                    text: "Không thể nhập quá 98%",
+                    className: "error",
+                    style: {
+                        background: "red",
+                    }
+                }).showToast();
+                return
+            }
+        })
+
+
+        // Handle search product
+        var debounceTimer;
+        $("#search-dropdown").on('input', function () {
+            var searchKey = $(this).val().trim()
+            const categoryId = $('#dropdown-button').attr('selected-id')
+            if(categoryId) {
+                getListProduct(searchKey, categoryId)
+            }else  {
+                getListProduct(searchKey, null)
+
+            }
+        })
+
+
+        function getListProduct(keyword, categoryId) {
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+            }
+
+            var url = `/api/products-no-pagination`
+            if(keyword != null && keyword.trim() != "") {
+                url += `?keyword=${keyword}`
+            }
+            if(categoryId != null && categoryId.trim() != "") {
+                if(url.includes("?")) {
+                    url += `&categoryId=${categoryId}`
+                }
+                else {
+                    url += `?categoryId=${categoryId}`
+                }
+            }
+
+            debounceTimer = setTimeout(async function () {
+                await $.ajax({
+                    method: 'GET',
+                    type: 'json',
+                    url: url,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        productListCurrent = data
+                        setChoosed(productListCurrent)
+                        loadHtmlProduct(productListCurrent)
+                        paginateProductList(productListCurrent)
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: "Lỗi",
+                            text: "xhr.responseJSON.message",
+                            icon: "error"
+                        });
+                    }
+                })
+            }, 500)
+        }
+
+        function setChoosed(productListCurrent) {
+            productListCurrent.forEach(product => {
+                product.productDetailDtos.forEach(detail => {
+                    if(productSelectedListDetailId.find(item => item == detail.id)) {
+                        detail.choosed = true
+                    }
+                })
+            })
+        }
+
+        function loadHtmlProduct(productList) {
+            var html = ''
+            productList.forEach(product => {
+                product.productDetailDtos.forEach(detail => {
+                    // Check if detail.choosed is true
+                    const isChoosedClass = detail.choosed ? 'is-choosed' : '';
+                    var htmlPrice = ``
+                    if(detail.discountedPrice == null) {
+                        htmlPrice = `<span class="font-bold text-sm">${detail.price}</span>`
+                    }
+                    else {
+                        htmlPrice = `
+                        <span class="text-sm line-through italic mr-1">${detail.price}</span>
+                        <span class="font-bold text-sm">${detail.discountedPrice}</span>
+                        `
+                    }
+                    html += `<div class="product-item group ${isChoosedClass} [&.is-choosed]:bg-gray-400/25" data-detail-id="${detail.id}">
+                                   <div class="product-item-inner flex justify-between items-center mb-4 mx-4 py-2 border-b border-blue-200">
+                                       <div class="product-info flex items-center">
+                                           <div class="w-12 h-16 mr-4">
+                                               <img src="/${product.imageUrl}" alt="">
+                                           </div>
+                                           <div>
+                                               <div>
+                                                   <span class="font-bold text-sm">${product.name}</span>
+                                               </div>
+                                               <div>
+                                                <span class="product-detail text-gray-400">
+                                                    <span class="text-sm">Barcode: </span>
+                                                    <span class="mr-2 text-sm">${detail.barcode}</span>
+                                                    <span class="text-sm">Size: </span>
+                                                    <span class="mr-2 text-sm">${detail.size.name}</span>
+                                                    <span>Màu: </span>
+                                                    <span class="text-sm">${detail.color.name}</span>
+                                                </span>
+                                               </div>
+                                               <div>
+                                                   <span class="text-gray-400 text-sm">Giá bán: </span>
+                                                   ${htmlPrice}
+                                                   <span class="ml-4 hidden group-[.is-choosed]:inline text-sm font-bold">Đã chọn</span>
+                                               </div>
+                                           </div>
+                                       </div>
+                                       <button class="choose-product-btn cursor-pointer hover:text-blue-500 group-[.is-choosed]:text-gray-400" >
+                                           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3zm0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5zm-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5h-2z"/></svg>
+                                       </button>
+                                   </div>
+                                </div>`
+                })
+            })
+            $('.list-product').html(html)
+            chooseProduct()
+
+        }
+
+        function chooseProduct() {
+            $('.choose-product-btn').on('click', function () {
+                const productItemEl = $(this).closest('.product-item')
+                $(this).prop('disabled', true)
+                const productDetailId = productItemEl.attr('data-detail-id')
+                productSelectedListDetailId.push(productDetailId)
+                productItemEl.addClass('is-choosed')
+
+                let isFound = false;
+                productListInit.forEach(product => {
+                    product.productDetailDtos.forEach(detail => {
+                        if(detail.id == productDetailId) {
+                            detail.choosed = true
+                            productSelectedList.push({
+                                name: product.name,
+                                imageUrl: product.imageUrl,
+                                detail: detail
+                            })
+                            appendSelectProduct({
+                                name: product.name,
+                                imageUrl: product.imageUrl,
+                                detail: detail
+                            })
+                            paginateSelectedProductList()
+                            isFound = true;
+                            return
+                        }
+                    })
+                    if(isFound) {
+                        return
+                    }
+                })
+            })
+        }
+
+        function appendSelectProduct(product) {
+            var html = `<div class="product-select-item" data-select-detail-id="${product.detail.id}">
+                                <div class="product-select-item-inner flex justify-between items-center mx-4 py-4 border-b border-blue-200">
+                                    <div class="product-select-info flex items-center">
+                                        <div class="w-12 h-16 mr-4">
+                                            <img src="/${product.imageUrl}"
+                                                 alt="">
+                                        </div>
+                                        <div>
+                                            <div>
+                                                <span class="font-bold text-sm">${product.name}</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-400 text-sm">
+                                                    <span>Barcode: </span>
+                                                     <span class="mr-2">${product.detail.barcode}</span>
+                                                    <span>Size: </span>
+                                                    <span class="mr-2">${product.detail.size.name}</span>
+                                                    <span>Cỡ: </span>
+                                                    <span>M</span>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-400 text-sm">Giá bán: </span>
+                                                <span class="product-select-price font-bold text-sm">${product.detail.price}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label
+                                               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Giảm
+                                            giá</label>
+                                        <div class="flex items-center">
+                                            <input type="text" class="percentage w-12 py-1 text-sm border-b-2 border-gray-400 outline-none  focus:border-gray-400 border-t-0 border-r-0 border-l-0" min="1" max="100">
+                                            <span class="text-sm">%&nbsp;</span>
+                                            <span class="text-sm">&nbsp; hoặc &nbsp;</span>
+                                            <input type="text" name="amount" placeholder="Giá sau"
+                                                   class="amount w-20 py-1 border-b-2 border-gray-400 outline-none text-sm  focus:border-gray-400 border-t-0 border-r-0 border-l-0"
+                                            >
+                                            <span class="text-sm">đ</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            Ngày bắt đầu
+                                        </label>
+                                        <div>
+                                            <input type="date" name="startDate" class="startDate bg-gray-50 py-1 text-sm text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            Ngày kết thúc
+                                        </label>
+                                        <div>
+                                            <input type="date" name="endDate" class="endDate bg-gray-50 py-1 text-sm text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        </div>
+                                    </div>
+                                    <div class="remove-select-btn cursor-pointer hover:text-red-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+                                             viewBox="0 0 20 20">
+                                            <path fill="red"
+                                                  d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07zm1.41-1.41A8 8 0 1 0 15.66 4.34A8 8 0 0 0 4.34 15.66zm9.9-8.49L11.41 10l2.83 2.83l-1.41 1.41L10 11.41l-2.83 2.83l-1.41-1.41L8.59 10L5.76 7.17l1.41-1.41L10 8.59l2.83-2.83l1.41 1.41z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>`
+
+            $('.list-select-product').append(html)
+            $('.startDate').val(getCurrentDate())
+            $('.endDate').val(getLastDayOfMonth())
+            handleRemoveSelect()
+            handleInputPrice()
+            handleDateChange();
+        }
+
+        function getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getLastDayOfMonth() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const lastDayOfMonth = new Date(year, month, 0).getDate();
+            const lastDayFormatted = `${year}-${month.toString().padStart(2, '0')}-${lastDayOfMonth.toString().padStart(2, '0')}`;
+            return lastDayFormatted;
+        }
+
+        function handleRemoveSelect() {
+            $('.remove-select-btn').on('click', function () {
+                const $productSelectItem = $(this).closest('.product-select-item')
+                const detailId = $productSelectItem.attr('data-select-detail-id')
+                productSelectedListDetailId = productSelectedListDetailId.filter(item => item != detailId)
+                $(`.product-item[data-detail-id='${detailId}']`).removeClass('is-choosed')
+                $(`.product-item[data-detail-id='${detailId}']`).find('button').prop('disabled', false)
+                $productSelectItem.remove()
+                paginateSelectedProductList()
+            })
+        }
+
+        function handleInputPrice() {
+            $(".percentage").on('input change', function () {
+                if(parseFloat($(this).val()) > 98) {
+                    $(this).val(98);
+                    Toastify({
+                        text: "Không thể nhập quá 98%",
+                        className: "error",
+                        style: {
+                            background: "red",
+                        }
+                    }).showToast();
+                    return
+                }
+                var initprice = removeAnyNonDigit($(this).closest('.product-select-item').find('.product-select-price').text())
+                var percentValue = $(this).val()
+                $(this).parent().find('.amount').val(Math.round(parseFloat(initprice) - parseFloat(initprice) * percentValue/100))
+            })
+
+            $(".amount").on('input change', function () {
+                var initprice = removeAnyNonDigit($(this).closest('.product-select-item').find('.product-select-price').text())
+                if(parseFloat($(this).val()) > initprice) {
+                    $(this).val(initprice)
+                    Toastify({
+                        text: "Không thể nhập quá giá gốc",
+                        className: "error",
+                        style: {
+                            background: "red",
+                        }
+                    }).showToast();
+                }
+                if($(this).val()) {
+                    const percent = ((parseFloat(initprice) - parseFloat($(this).val()))/ parseFloat(initprice)) * 100
+                    $(this).parent().find('.percentage').val(percent.toFixed(2))
+                }
+                else {
+                    $(this).parent().find('.percentage').val('')
+                }
+            })
+
+            $(".percentage").on('keypress', function (e) {
+                // Lấy mã ASCII của ký tự được nhấn
+                const charCode = (e.which) ? e.which : e.keyCode;
+
+                // Chuyển đổi mã ASCII thành ký tự
+                const charTyped = String.fromCharCode(charCode);
+                const inputValue = $(this).val()
+                // Kiểm tra xem ký tự có phải là số float hay không
+                if (!/^\d*\.?\d*$/.test(charTyped) || (charTyped === '.' && inputValue.includes('.'))) {
+                    // Nếu không phải số float, ngăn chặn sự kiện keypress
+                    e.preventDefault();
+                }
+            });
+
+            $(".amount").on('keypress', function (e) {
+                onlyAllowNumberInput(e)
+            });
+        }
+
+        function handleDateChange() {
+            $('.startDate').on('change', function () {
+                var parent = $(this).closest('.product-select-item');
+                const endDate = parent.find(".endDate")
+                if(endDate.val() != "" && endDate.val() != null) {
+                    if($(this).val() >= endDate.val()) {
+                        Toastify({
+                            text: "Ngày bắt đầu phải nhỏ hơn ngày kết thúc",
+                            className: "error",
+                            style: {
+                                background: "red",
+                                color: "white"
+                            }
+                        }).showToast();
+                        $(this).val("")
+                    }
+                }
+
+            })
+
+            $('.endDate').on('change', function () {
+                var parent = $(this).closest('.product-select-item');
+                const startDate = parent.find(".startDate")
+                if(startDate.val() != "" && startDate.val() != null) {
+                    if($(this).val() <= startDate.val()) {
+                        Toastify({
+                            text: "Ngày kết thúc phải lớn hơn ngày bắt đầu",
+                            className: "error",
+                            style: {
+                                background: "red",
+                                color: "white"
+                            }
+                        }).showToast();
+                        $(this).val("")
+                    }
+                }
+
+            })
+        }
+
+        handleSubmit()
+    //     ============================================ HANDLE SUBMIT ==========================
+        function handleSubmit() {
+            $('#save-discount-btn').on('click', async function () {
+                var productDiscounts = []
+                var canSubmit = true
+                await $('.product-select-item').each((index, item) => {
+                    const productItem = $(item)
+                    const amount = productItem.find('.amount').val()
+                    const startDate = productItem.find('.startDate').val()
+                    const endDate = productItem.find('.endDate').val()
+                    if (amount.trim() == '' || amount == null) {
+                        Swal.fire({
+                            title: 'Lỗi',
+                            text: 'Vui lòng điền đấy đủ giá giảm',
+                            icon: 'error',
+                        })
+                        canSubmit = false
+                        return
+                    }
+
+                    if (startDate == '' || startDate == null) {
+                        Swal.fire({
+                            title: 'Lỗi',
+                            text: 'Vui lòng điền đấy đủ ngày bắt đầu',
+                            icon: 'error',
+                        })
+                        canSubmit = false
+                        return
+                    }
+
+                    if (endDate == '' || endDate == null) {
+                        Swal.fire({
+                            title: 'Lỗi',
+                            text: 'Vui lòng điền đấy đủ ngày kết thúc',
+                            icon: 'error',
+                        })
+                        canSubmit = false
+                        return
+                    }
+
+                    productDiscounts.push({
+                        discountedAmount: productItem.find('.amount').val(),
+                        startDate: productItem.find('.startDate').val(),
+                        endDate: productItem.find('.endDate').val(),
+                        productDetailId: productItem.attr('data-select-detail-id')
+                    })
+                })
+
+                if(!canSubmit) {
+                    return;
+                }
+
+                const dataSend = {productDiscounts: productDiscounts}
+                await $.ajax({
+                    type: "POST",
+                    url: `/api/private/product-discount/multiple`,
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(dataSend),
+                    success: function () {
+                        Swal.fire({
+                            title: 'Tạo giảm giá',
+                            text: 'Thiết lập giảm giá thành công',
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonText: 'Tiếp tục thiết lập',
+                            cancelButtonText: 'Quay lại'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Chuyển trang khi người dùng nhấn "OK"
+                                window.location.reload()
+                            } else {
+                                window.location.href = '/admin-only/product-discount'
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        $('#loading-overlay').hide();
+                        swal("Error", xhr.responseJSON.message, "error")
+                    }
+                })
+
+            })
+        }
+
+
+
+
+
+        $('#cancel-discount-btn').on('click', function () {
+            window.location.href = '/admin-only/product-discount'
+        })
+
+        $('#select-all').on('click', function () {
+            $('.product-item').addClass('is-choosed')
+            $('.product-item').prop('disabled', true)
+            $('.product-item').each((index, item) => {
+                const productEl = $(item)
+                const detailId = productEl.attr('data-detail-id')
+                // Kiểm tra xem detailId đã tồn tại trong mảng chưa
+                if (!productSelectedListDetailId.includes(detailId)) {
+                    // Nếu chưa tồn tại, thêm vào mảng
+                    productSelectedListDetailId.push(detailId);
+                }
+
+            })
+
+            productListCurrent.forEach(product => {
+                product.productDetailDtos.forEach(detail => {
+                    appendSelectProduct({
+                        name: product.name,
+                        imageUrl: product.imageUrl,
+                        detail: detail
+                    })
+                })
+            })
+
+            paginateSelectedProductList()
+        })
+
+        $('#remove-all-select').on('click', function () {
+            $('.list-select-product').html('')
+            $('.product-item').prop('disabled', false)
+            productSelectedList = []
+            productSelectedListDetailId = []
+            setInitChoosedFalse()
+            loadHtmlProduct(productListInit)
+            paginateProductList()
+        })
+
+    })
+</script>
+</body>
+</html>

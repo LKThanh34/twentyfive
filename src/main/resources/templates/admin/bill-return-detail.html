@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="invoice-title">
+                            <h4 class="float-end font-size-15">
+                                <a th:href="@{'/admin/getbill-detail/' + ${billReturnDetail.billId}}" class="badge bg-success font-size-12 ms-2" th:text="${'Hóa đơn gốc: '+ billReturnDetail.billCode}"></a><br>
+
+                            </h4>
+<!--                            <div class="float-end mr-4">-->
+                                <!-- Add class 'active' to progress -->
+<!--                                <div class="track"-->
+<!--                                     th:if="${billReturnDetail.billReturnStatus != 4}">-->
+<!--                                    <div class="step" th:classappend="${-->
+<!--                                    billReturnDetail.billReturnStatus == 0 ||-->
+<!--                                    billReturnDetail.billReturnStatus == 1 ||-->
+<!--                                    billReturnDetail.billReturnStatus == 2 ||-->
+<!--                                    billReturnDetail.billReturnStatus == 3  ? 'active' : ''}-->
+<!--                                    ">-->
+<!--                                            <span class="icon">-->
+<!--                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"-->
+<!--                                                     viewBox="0 0 256 256">-->
+<!--                                                    <path fill="currentColor"-->
+<!--                                                          d="M232 136.66A104.12 104.12 0 1 1 119.34 24a8 8 0 0 1 1.32 16A88.12 88.12 0 1 0 216 135.34a8 8 0 0 1 16 1.32ZM120 72v56a8 8 0 0 0 8 8h56a8 8 0 0 0 0-16h-48V72a8 8 0 0 0-16 0Zm40-24a12 12 0 1 0-12-12a12 12 0 0 0 12 12Zm36 24a12 12 0 1 0-12-12a12 12 0 0 0 12 12Zm24 36a12 12 0 1 0-12-12a12 12 0 0 0 12 12Z" />-->
+<!--                                                </svg>-->
+<!--                                            </span>-->
+<!--                                        <span class="text">Chờ xác nhận</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="step" th:classappend="${-->
+
+<!--                                    billReturnDetail.billReturnStatus == 1 ||-->
+<!--                                    billReturnDetail.billReturnStatus == 2 ||-->
+<!--                                    billReturnDetail.billReturnStatus == 3 ? 'active' : ''}-->
+<!--                                    ">-->
+<!--                                            <span class="icon">-->
+<!--                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"-->
+<!--                                                     viewBox="0 0 24 24">-->
+<!--                                                    <g fill="none" stroke-width="1.5">-->
+<!--                                                        <path fill="currentColor"-->
+<!--                                                              d="m2.695 7.185l9 4l.61-1.37l-9-4l-.61 1.37ZM12.75 21.5v-11h-1.5v11h1.5Zm-.445-10.315l9-4l-.61-1.37l-9 4l.61 1.37Z" />-->
+<!--                                                        <path stroke="currentColor" stroke-linecap="round"-->
+<!--                                                              stroke-linejoin="round"-->
+<!--                                                              d="M3 17.11V6.89a.6.6 0 0 1 .356-.548l8.4-3.734a.6.6 0 0 1 .488 0l8.4 3.734A.6.6 0 0 1 21 6.89v10.22a.6.6 0 0 1-.356.548l-8.4 3.734a.6.6 0 0 1-.488 0l-8.4-3.734A.6.6 0 0 1 3 17.11Z" />-->
+<!--                                                        <path stroke="currentColor" stroke-linecap="round"-->
+<!--                                                              stroke-linejoin="round"-->
+<!--                                                              d="m7.5 4.5l8.644 3.842a.6.6 0 0 1 .356.548v3.61" />-->
+<!--                                                    </g>-->
+<!--                                                </svg>-->
+<!--                                            </span>-->
+<!--                                        <span class="text"> Chờ lấy hàng</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="step" th:classappend="${-->
+<!--                                    billReturnDetail.billReturnStatus == 2 ||-->
+<!--                                    billReturnDetail.billReturnStatus == 3  ? 'active' : ''}-->
+<!--                                    ">-->
+<!--                                        <span class="icon"> <i class="fa fa-truck"></i> </span>-->
+<!--                                        <span class="text"> Chờ giao hàng </span>-->
+<!--                                    </div>-->
+<!--                                    <div class="step" th:classappend="${-->
+
+<!--                                    billReturnDetail.billReturnStatus == 3  ? 'active' : ''}-->
+<!--                                    ">-->
+<!--                                            <span class="icon">-->
+<!--                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"-->
+<!--                                                     viewBox="0 0 24 24">-->
+<!--                                                    <path fill="currentColor"-->
+<!--                                                          d="M19 13c.7 0 1.37.13 2 .35V12l-1-5H4l-1 5v2h1v6h9.09c-.05-.33-.09-.66-.09-1c0-1.23.37-2.36 1-3.31V14h1.69c.95-.63 2.08-1 3.31-1m-7 5H6v-4h6v4m-6.96-6l.6-3h12.72l.6 3H5.04M20 6H4V4h16v2m2.5 11.25L17.75 22L15 19l1.16-1.16l1.59 1.59l3.59-3.59l1.16 1.41" />-->
+<!--                                                </svg>-->
+<!--                                            </span>-->
+<!--                                        <span class="text">Hoàn thành</span>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div-->
+<!--                                        th:if="${billReturnDetail.billReturnStatus == 4}">-->
+<!--                                    <div class="text-danger font-weight-bold border rounded p-2 border-danger">-->
+<!--                                        ĐÃ HỦY-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+                            <div class="mb-4">
+                                <h2 class="mb-1 text-muted">Đổi trả #[[${billReturnDetail.billReturnCode}]]</h2>
+                            </div>
+                            <div class="text-muted">
+                                <p class="mb-1">Tòa nhà FPT Polytechnic, Cổng số 2, 13 P. Trịnh Văn Bô</p>
+                                <p class="mb-1"><i class="uil uil-envelope-alt me-1"></i> five-shop@987.com</p>
+                                <p><i class="uil uil-phone me-1"></i> 012-345-6789</p>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="text-muted">
+                                    <h5 class="font-size-16 mb-3">Khách hàng:</h5>
+                                    <h5 class="font-size-15 mb-2" th:if="${billReturnDetail.customerDto != null}" th:text="${billReturnDetail.customerDto.name}">Preston Miller</h5>
+                                    <h6 class="mb-2 font-italic" th:if="${billReturnDetail.customerDto == null}">Khách lẻ</h6>
+                                    <p th:if="${billReturnDetail.customerDto != null}" th:text="${billReturnDetail.customerDto.phoneNumber}">001-234-5678</p>
+
+                                </div>
+                            </div>
+                            <!-- end col -->
+                            <div class="col-sm-6">
+                                <div class="text-muted text-sm-end">
+                                    <div class="mt-4">
+                                        <h5 class="font-size-15 mb-1">Ngày đổi trả hàng:</h5>
+                                        <p th:text="${#temporals.format(billReturnDetail.returnDate, 'dd-MM-yyyy HH:mm')}">25/11/2023</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- end col -->
+                        </div>
+                        <!-- end row -->
+<!--                        <div class="py-2 mb-4">-->
+<!--                            <div>-->
+<!--                                <h5>Voucher: </h5>-->
+<!--                            </div>-->
+<!--                            <div th:if="${billdetail.voucherName != null}">-->
+<!--                                <span style="color: red; font-size: 16px" th:text="${billdetail.voucherName}"> </span>-->
+<!--                            </div>-->
+<!--                            <div th:if="${billdetail.voucherName == null}">-->
+<!--                                <span class="text-muted">Không sử dụng</span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div class="mb-4">-->
+<!--                            <div>-->
+<!--                                Loại đơn : <h5 style="color: rgb(21, 219, 153);">-->
+<!--                                <span th:if="${billdetail.loaiHoaDon == T(com.project.DuAnTotNghiep.entity.enumClass.InvoiceType).OFFLINE}">Tại quầy</span>-->
+<!--                                <span th:if="${billdetail.loaiHoaDon == T(com.project.DuAnTotNghiep.entity.enumClass.InvoiceType).ONLINE}">Online</span>-->
+<!--                            </h5>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+                        <div class="py-2">
+                            <h5 class="font-size-15 mb-2 text-primary">Danh sách hàng trả</h5>
+
+                            <div class="table-responsive">
+                                <table class="table align-middle table-nowrap table-centered mb-0">
+                                    <thead>
+                                    <tr>
+
+                                        <th>Sản phẩm</th>
+                                        <th>Màu sắc</th>
+                                        <th>Kích cỡ</th>
+                                        <th>Giá tiền</th>
+                                        <th>Số lượng</th>
+                                        <th class="text-end" style="width: 120px;">Thành tiền</th>
+                                    </tr>
+                                    </thead><!-- end thead -->
+                                    <tbody>
+                                    <tr th:each="item:${billReturnDetail.refundProductDtos}">
+                                        <td>
+                                            <div>
+                                                <h6 class="text-truncate font-size-14 mb-1" th:text="${item.productName}">Black Strap A012</h6>
+                                            </div>
+                                        </td>
+                                        <td th:text="${item.color}"></td>
+                                        <td th:text="${item.size}">$ 245.50</td>
+                                        <td th:text="${#numbers.formatDecimal(item.momentPriceRefund, 0, 'POINT', 0, 'COMMA')}"></td>
+                                        <td th:text="${item.quantityRefund}"></td>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(item.momentPriceRefund * item.quantityRefund, 0, 'POINT', 0, 'COMMA')}">$ 245.50</td>
+                                    </tr>
+                                    <!-- end tr -->
+
+                                    <th:block th:if="${billReturnDetail.returnProductDtos.isEmpty() || billReturnDetail.returnProductDtos == null}">
+                                        <tr>
+                                            <th scope="row" colspan="5" class="text-end">Tổng tiền trả</th>
+                                            <td class="text-end" th:text="${#numbers.formatDecimal(total, 0, 'POINT', 0, 'COMMA')}">$732.50</td>
+                                        </tr>
+                                        <!-- end tr -->
+                                        <tr>
+                                            <th scope="row" colspan="5" class="border-0 text-end">
+                                                Phí :</th>
+                                            <td class="border-0 text-end" th:text="${billReturnDetail.percentFeeExchange}"></td>
+                                        </tr>
+                                        <!-- end tr -->
+
+                                        <!-- end tr -->
+                                        <tr>
+                                            <th scope="row" colspan="5" class="border-0 text-end">Tiền trả khách:</th>
+                                            <td class="border-0 text-end"><h4 class="m-0 fw-semibold" th:text="${#numbers.formatDecimal(total - total*billReturnDetail.percentFeeExchange/100, 0, 'POINT', 0, 'COMMA')}">$739.00</h4></td>
+                                        </tr>
+                                    </th:block>
+                                    <!-- end tr -->
+                                    </tbody><!-- end tbody -->
+                                </table><!-- end table -->
+                            </div><!-- end table responsive -->
+                        </div>
+
+
+                        <div class="py-2" th:if="${!billReturnDetail.returnProductDtos.isEmpty() && billReturnDetail.returnProductDtos != null}">
+                            <h5 class="font-size-15 mb-2 text-primary">Danh sách hàng đổi</h5>
+
+                            <div class="table-responsive">
+                                <table class="table align-middle table-nowrap table-centered mb-0">
+                                    <thead>
+                                    <tr>
+
+                                        <th>Sản phẩm</th>
+                                        <th>Màu sắc</th>
+                                        <th>Kích cỡ</th>
+                                        <th>Giá tiền</th>
+                                        <th>Số lượng</th>
+                                        <th class="text-end" style="width: 120px;">Total</th>
+                                    </tr>
+                                    </thead><!-- end thead -->
+                                    <tbody>
+                                    <tr th:each="item:${billReturnDetail.returnProductDtos}">
+                                        <td>
+                                            <div>
+                                                <h6 class="text-truncate font-size-14 mb-1" th:text="${item.productName}">Black Strap A012</h6>
+                                            </div>
+                                        </td>
+                                        <td th:text="${item.color}"></td>
+                                        <td th:text="${item.size}">$ 245.50</td>
+                                        <td th:text="${#numbers.formatDecimal(item.momentPriceExchange, 0, 'POINT', 0, 'COMMA')}"></td>
+                                        <td th:text="${item.quantityReturn}"></td>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(item.momentPriceExchange * item.quantityReturn, 0, 'POINT', 0, 'COMMA')}">$ 245.50</td>
+                                    </tr>
+                                    <!-- end tr -->
+
+                                    <tr>
+                                        <th scope="row" colspan="5" class="border-0 text-end">Tổng tiền trả</th>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(total, 0, 'POINT', 0, 'COMMA')}">$732.50</td>
+                                    </tr>
+                                    <!-- end tr -->
+                                    <tr>
+                                        <th scope="row" colspan="5" class="border-0 text-end">
+                                            Phí :</th>
+                                        <td class="border-0 text-end" th:text="${billReturnDetail.percentFeeExchange}"></td>
+                                    </tr>
+                                    <!-- end tr -->
+                                    <tr>
+                                        <th scope="row" colspan="5" class="border-0 text-end">Tổng tiền đổi</th>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(totalReturn, 0, 'POINT', 0, 'COMMA')}">$732.50</td>
+                                    </tr>
+                                    <!-- end tr -->
+                                    <tr th:if="${totalReturn > (total - total*billReturnDetail.percentFeeExchange/100)}">
+                                        <th scope="row" colspan="5" class="border-0 text-end">Tiền khách trả</th>
+                                        <td class="border-0 text-end"><h4 class="m-0 fw-semibold" th:text="${#numbers.formatDecimal(totalReturn - (total - total*billReturnDetail.percentFeeExchange/100), 0, 'POINT', 0, 'COMMA')}">$739.00</h4></td>
+                                    </tr>
+
+                                    <tr th:if="${totalReturn <= (total - total*billReturnDetail.percentFeeExchange/100)}">
+                                        <th scope="row" colspan="5" class="border-0 text-end">Tiền trả khách</th>
+                                        <td class="border-0 text-end"><h4 class="m-0 fw-semibold" th:text="${#numbers.formatDecimal((total - total*billReturnDetail.percentFeeExchange/100) - totalReturn, 0, 'POINT', 0, 'COMMA')}">$739.00</h4></td>
+                                    </tr>
+                                    <!-- end tr -->
+                                    </tbody><!-- end tbody -->
+                                </table><!-- end table -->
+                            </div><!-- end table responsive -->
+                        </div>
+
+                        <div class="d-print-none mt-4">
+                            <div class="float-end">
+                                <button th:link="'/admin/bill-return-detail-generate/'+${billReturnDetail.id}" id="print-btn" class="btn btn-success me-1"><i class="fa fa-print"></i></button>
+                                <a th:href="@{'/admin-only/bill-return'}">
+                                    <button type="button" class="btn btn-secondary w-md" data-dismiss="modal">Đóng</button>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- end col -->
+        </div>
+    </div>
+    <script>
+        $('.cancel-bill-return-btn').on('click', function (e) {
+            e.stopPropagation()
+            Swal.fire({
+                title: "Xác nhận?",
+                text: `Bạn chắc chắn muốn hủy đơn này!`,
+                icon: "warning",
+                showCancelButton: true,
+                cancelButtonText: 'Hủy',
+                confirmButtonText: 'Xác nhận',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).closest('form').submit();
+                }
+            });
+        })
+
+        $('#print-btn').on('click', function (e) {
+            const url = $(this).attr('link')
+            // Create a new iframe element dynamically
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none'; // Hide the iframe
+            document.body.appendChild(iframe);
+
+            // Set the iframe source to the specified URL
+            iframe.src = url;
+
+            // Wait for the iframe to load and then print
+            iframe.onload = function() {
+                setTimeout(function() {
+                    iframe.contentWindow.print();
+                    // Remove the iframe from the DOM after printing
+                    document.body.removeChild(iframe);
+                }, 300); // Adjust the delay as needed
+            };
+        })
+    </script>
+</div>
+
+</body>
+</html>

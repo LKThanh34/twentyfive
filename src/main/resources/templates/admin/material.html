@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+</head>
+<body>
+<div layout:fragment="content">
+
+  <h4>Quản lý chất liệu</h4>
+  <a href="/admin/material-create" class="btn btn-success my-3 float-right"><i class="fa fa-plus-square"></i> <span>Thêm chất liệu</span></a>
+  <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+  <table class="table my-3">
+    <thead class="thead-light">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Mã chất liệu
+        <a th:href="@{/admin/material-all(page=0, sort='id,asc')}" class="sort-link">↑</a>
+        <a th:href="@{/admin/material-all(page=0, sort='id,desc')}" class="sort-link">↓</a>
+      </th>
+      <th scope="col">Tên chất liệu</th>
+      <th scope="col">Thao tác</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="items:${items}">
+      <th scope="row" th:text="${items.id}">1</th>
+      <td th:text="${items.code}">Mark</td>
+      <td th:text="${items.name}"></td>
+      <td>
+<!--        <a th:data-link="'/admin/material-delete/'+${items.id}" class="delete-btn cursor-pointer"><i class="fa fa-trash-o"></i></a>-->
+        <a th:href="@{'/admin/material-detail/'+${items.id}}"><i class="fa ti-pencil-alt"></i></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <div class="clearfix float-right">
+    <ul class="pagination">
+      <li th:classappend="${items.hasPrevious() ? '' : 'disabled'}" class="page-item">
+        <a th:href="@{/admin/material-all(page=0, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')})}"
+           class="page-link">
+          <i class="fas fa-angle-double-left"></i>
+        </a>
+      </li>
+      <li th:classappend="${items.hasPrevious() ? '' : 'disabled'}" class="page-item">
+        <a th:href="@{/admin/material-all(page=${items.number - 1}, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')})}"
+           class="page-link">
+          <i class="fas fa-angle-left"></i>
+        </a>
+      </li>
+      <li th:classappend="${items.hasNext() ? '' : 'disabled'}" class="page-item">
+        <a th:href="@{/admin/material-all(page=${items.number + 1}, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')})}"
+           class="page-link">
+          <i class="fas fa-angle-right"></i>
+        </a>
+      </li>
+      <li th:classappend="${items.hasNext() ? '' : 'disabled'}" class="page-item">
+        <a th:href="@{/admin/material-all(page=${items.totalPages - 1}, sort=${sortField + ',' + (sortDirection == 'asc' ? 'desc' : 'asc')})}"
+           class="page-link">
+          <i class="fas fa-angle-double-right"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      $('.delete-btn').on('click', function (e) {
+        Swal.fire({
+          title: "Xác nhận?",
+          text: `Bạn chắc chắn muốn xóa chất liệu này`,
+          icon: "warning",
+          showCancelButton: true,
+          cancelButtonText: 'Hủy',
+          confirmButtonText: 'Xác nhận',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // const id = $(this).attr('data-product-id')
+            var url = $(this).attr('data-link')
+            window.location.href = url
+          }
+        });
+      })
+    })
+  </script>
+</div>
+</body>
+</html>

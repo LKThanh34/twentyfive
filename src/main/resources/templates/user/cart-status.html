@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{user/layout-user.html}">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+<div id="loading-overlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<!-- breadcrumb -->
+<div class="container">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+
+        <span class="stext-109 cl4">
+					Trạng thái đơn hàng
+        </span>
+    </div>
+</div>
+
+
+<!-- Shoping Cart -->
+<div class="bg0 p-t-75 p-b-85">
+    <!-- Tab items -->
+
+    <div class="container">
+        <div class="tab-bills">
+            <div class="tab-item" data-status="">
+                Tất cả
+            </div>
+            <div class="tab-item" data-status="CHO_XAC_NHAN">
+                Chờ xác nhận
+            </div>
+            <div class="tab-item" data-status="CHO_LAY_HANG">
+                Chờ lấy hàng
+            </div>
+            <div class="tab-item" data-status="CHO_GIAO_HANG">
+                Chờ giao hàng
+            </div>
+            <div class="tab-item" data-status="HOAN_THANH">
+                Hoàn thành
+            </div>
+            <div class="tab-item" data-status="TRA_HANG">
+                Đổi trả
+            </div>
+            <div class="tab-item" data-status="HUY">
+                Đã hủy
+            </div>
+<!--            <div class="tab-item" data-status="HUY">-->
+<!--                Trả hàng-->
+<!--            </div>-->
+            <div class="line"></div>
+        </div>
+        <div class="">
+            <table class="table-shopping-cart">
+
+                <tr class="table_head">
+                    <th class="text-center">Đơn hàng</th>
+                    <th class="text-center">Ngày đặt</th>
+                    <th class="text-center">Tổng tiền</th>
+                    <th class="text-center">Hình thức thanh toán</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thông tin chi tiết</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+                <tr th:if="${bills.content.size() == 0}" class="text-center">
+                    <td colspan="7" class="font-italic">Không có đơn hàng nào</td>
+                </tr>
+                <tr class="product-item" th:each="bill : *{bills.content}">
+                    <td class="text-center" th:text="${bill.code}"></td>
+                    <td class="text-center" th:text="${#temporals.format(bill.createDate, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td class="text-center" th:text="${#numbers.formatDecimal(bill.amount, 0, 'POINT', 0, 'COMMA') + ' VND'}"> VND</td>
+                    <td class="text-center" th:text="${bill.paymentMethod.name}"></td>
+                    <td class="text-center" th:text="${bill.status}"></td>
+                    <td class="">
+                        <span class="text-primary font-weight-bold js-show-detail cursor-pointer">Hiển thị thông tin sản phẩm</span>
+                        <div class="modal-cart-detail p-4">
+                            <div th:each="billDetail : *{bill.billDetail}">
+                                <a th:href="'/product-detail/' + ${billDetail.productDetail.product.code}" th:text="${billDetail.productDetail.product.name}"></a>
+                                <div>
+                                    <span class="mr-2" th:text="'Màu: ' + ${billDetail.productDetail.color.name}"></span>
+                                    <span class="mr-2" th:text="'Size: ' + ${billDetail.productDetail.size.name}"></span>
+                                    <span class="mr-2" th:text="'SL: ' + ${billDetail.quantity}"></span>
+                                </div>
+                                <hr>
+                            </div>
+                            <span class="close-modal-detail cursor-pointer p-2">&times</span>
+                        </div>
+                    </td>
+                    <td>
+                        <form method="POST" th:action="'/cancel-bill/' + ${bill.id}" class="form-cancel-order">
+                            <button type="submit" class="btn btn-danger" id="cancel-bill" th:if="${
+                                    bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).CHO_XAC_NHAN ||
+                                     bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).CHO_LAY_HANG }"
+                            >
+
+                                Hủy đơn
+                            </button>
+
+                        </form>
+                    </td>
+                </tr>
+            </table>
+            <nav th:if="${bills.totalPages > 0}" class="pagination is-right mt-4" role="navigation" aria-label="pagination" >
+                <ul class="pagination-list">
+                    <li>
+                        <a th:if="${bills.pageable.pageNumber != 0 && status == null}" th:href="@{/cart-status?page=0}" class="pagination-link" aria-label="First">
+                            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                        </a>
+                        <a th:if="${bills.pageable.pageNumber != 0 && status != null}" th:href="@{'/cart-status?page=0' + '&status=' + ${status}}" class="pagination-link" aria-label="First">
+                            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                        </a>
+                        <a th:unless="${bills.pageable.pageNumber != 0}" class="pagination-link is-disabled" aria-label="First">
+                            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:if="${bills.pageable.pageNumber > 0 && status!=null}" th:href="@{'/cart-status?page=' + ${bills.pageable.pageNumber - 1}}" class="pagination-link" aria-label="Previous">
+                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        </a>
+                        <a th:if="${bills.pageable.pageNumber > 0 && status!=null}" th:href="@{'/cart-status?page=' + ${bills.pageable.pageNumber - 1}}" class="pagination-link" aria-label="Previous">
+                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        </a>
+                        <a th:unless="${bills.pageable.pageNumber > 0}" class="pagination-link is-disabled" aria-label="Previous">
+                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        </a>
+                    </li>
+
+                    <li th:each="page : ${#numbers.sequence(0, bills.totalPages - 1)}">
+                        <a th:if="${status == null}" th:href="@{'/cart-status?page=' + ${page}}" th:classappend="${page == bills.pageable.pageNumber} ? 'is-current'" class="pagination-link" aria-label="Page [[${page + 1}]]">
+                            [[${page + 1}]]
+                        </a>
+                        <a th:if="${status != null}" th:href="@{'/cart-status?page=' + ${page} + '&status=' + ${status}}" th:classappend="${page == bills.pageable.pageNumber} ? 'is-current'" class="pagination-link" aria-label="Page [[${page + 1}]]">
+                            [[${page + 1}]]
+                        </a>
+                    </li>
+
+                    <li>
+                        <a th:if="${bills.pageable.pageNumber < bills.totalPages - 1 && status == null}" th:href="@{'/cart-status?page=' + ${bills.pageable.pageNumber + 1}}" class="pagination-link" aria-label="Next">
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                        <a th:if="${bills.pageable.pageNumber < bills.totalPages - 1 && status !=null }" th:href="@{'/cart-status?page=' + ${bills.pageable.pageNumber + 1} + '&status=' + ${status} }" class="pagination-link" aria-label="Next">
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+
+                        <a th:unless="${bills.pageable.pageNumber < bills.totalPages - 1}" class="pagination-link is-disabled" aria-label="Next">
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a th:if="${bills.pageable.pageNumber < bills.totalPages - 1 && status == null}" th:href="@{'/cart-status?page=' + ${bills.totalPages - 1}}" class="pagination-link" aria-label="Last">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        </a>
+                        <a th:if="${bills.pageable.pageNumber < bills.totalPages - 1 && status != null}" th:href="@{'/cart-status?page=' + ${bills.totalPages - 1} + '&status=' + ${status} }" class="pagination-link" aria-label="Last">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        </a>
+                        <a th:unless="${bills.pageable.pageNumber < bills.totalPages - 1}" class="pagination-link is-disabled" aria-label="Last">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" th:inline="javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+
+            $('.js-show-detail').on('click', function () {
+                $('.modal-cart-detail').removeClass('active')
+                $(this).parent().find('.modal-cart-detail').addClass('active')
+            })
+
+            $('.close-modal-detail').on('click', function () {
+                $('.modal-cart-detail').removeClass('active')
+            })
+
+            $(".form-cancel-order").on('submit', function (e) {
+                e.preventDefault();
+                var form = this; // select the form
+
+                Swal.fire({
+                    title: 'Hủy đơn hàng',
+                    text: 'Bạn chắc chắc muốn hủy đơn hàng này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Hủy',
+                    confirmButtonText: 'Xác nhận',
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+
+                        form.submit()
+                    }
+                })
+            })
+
+            var tabActivec = /*[[${status}]]*/ '';
+
+            if(tabActivec == null) {
+                tabActivec = ''
+            }
+            $(".tab-item").each(function (index) {
+                const $tab = $(this);
+                const $panes = $(".tab-pane");
+                // if($tab.attr('data-status') == '') {
+                //     $tab.addClass("active");
+                //     const $pane = $panes.eq(0);
+                //     $pane.addClass("active")
+                // }
+                if($tab.attr('data-status') == tabActivec) {
+                    $tab.addClass("active");
+                    const $pane = $panes.eq(index);
+                    $pane.addClass("active")
+                }
+            })
+
+            openTab()
+
+            function openTab() {
+                const $tabs = $(".tab-item");
+                const $panes = $(".tab-pane");
+                const $tabActive = $(".tab-item.active");
+                const $line = $(".tab-bills .line");
+
+                $line.css({
+                    left: $tabActive.position().left + "px",
+                    width: $tabActive.outerWidth() + "px"
+                });
+
+                $tabs.each(function (index) {
+                    const $tab = $(this);
+                    const $pane = $panes.eq(index);
+
+                    $tab.on("click", function () {
+
+
+                        $line.css({
+                            left: $tab.position().left + "px",
+                            width: $tab.outerWidth() + "px"
+                        });
+
+                        // $tab.addClass("active");
+                        // $pane.addClass("active");
+                        var status = $tab.attr('data-status')
+                        var url = ''
+                        if(status == null || status == '') {
+                            url = '/cart-status'
+                        }else {
+                            url = `/cart-status?status=${status}`
+                        }
+                        window.location.href = url
+                    });
+                });
+            }
+        })
+
+    </script>
+
+</div>
+</body>
+</html>

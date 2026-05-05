@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div layout:fragment="content">
+    <h4>Sản phẩm chi tiết</h4>
+    <form th:object="${form}" th:method="post" th:action="@{/admin/product-save-edit}" enctype="multipart/form-data" id="myForm">
+        <div class="m-3" >
+            <div class="form-table" th:each="productDetail, iterStat : *{productDetailList}">
+                <div class="form-row align-items-center">
+                    <input type="hidden" th:field="*{productDetailList[__${iterStat.index}__].id}">
+                    <div class="form-group col-md-2">
+                        <label>Barcode</label>
+                        <input type="text" class="form-control barcode-select" th:field="*{productDetailList[__${iterStat.index}__].barcode}" readonly required>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Màu sắc</label>
+                        <select class="form-select color-select" th:field="*{productDetailList[__${iterStat.index}__].color}">
+                            <option th:each="color: ${listColor}" th:value="${color.id}" th:data-code="${color.code}" th:text="${color.name}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Kích cỡ</label>
+                        <select class="form-select size-select" th:field="*{productDetailList[__${iterStat.index}__].size}">
+                            <option th:each="size: ${listSize}" th:value="${size.id}" th:data-code="${size.code}" th:text="${size.name}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Số lượng</label>
+                        <input type="number" class="form-control product-quantity" th:field="*{productDetailList[__${iterStat.index}__].quantity}" required>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Giá tiền</label>
+                        <input type="text" class="form-control product-price"  th:value="*{#numbers.formatDecimal(productDetailList[__${iterStat.index}__].price, 0, 0)}" th:name="${'productDetailList['+iterStat.index+'].price'}"  required>
+                    </div>
+                </div>
+
+                <!--                <div class="form-row">-->
+                <!--                   -->
+                <!--                </div>-->
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <button type="button" class="btn btn-danger ml-2 rounded" onclick="addItem()">Thêm thuộc tính</button>
+            </div>
+        </div>
+        <div class="form-section">
+            <h2 class="title">Hình ảnh</h2>
+            <label class="control-label">
+                Chọn 1 hoặc nhiều hình ảnh
+            </label>
+            <div class="image-group d-flex">
+                <div class="selected-files d-flex" id="selected-images">
+                    <div th:each="item : ${listImages}" class="selected-file me-2">
+                        <img class="exists-image" th:src="@{'/' + ${item.link}}" alt="Selected Image" width="100" height="120" th:data-image="${item.id}">
+                        <div class="file-details">
+<span class="text-danger delete-img-btn">
+                                                <i class="fas fa-times-circle"></i>
+                                            </span>                        </div>
+                    </div>
+
+                </div>
+                <div class="image-upload">
+                    <label for="file-input" class="label-select-img">
+                        <i class="fa fa-plus"></i>
+                    </label>
+                    <input id="file-input"  type="file" multiple accept="image/*" />
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary m-1 rounded"><i class="fa ti-save"></i> Lưu lại</button>
+        <a href="/admin/product-all" class="btn btn-secondary m-1 rounded"><i class="fa fa-mail-reply (alias)"></i>
+            <span>Hủy bỏ</span></a>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" th:inline="javascript"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js" th:inline="javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js" th:inline="javascript"></script>
+
+    <script th:inline="javascript">
+
+        // Khoi tao list detail color and size hiện tại để chuẩn bị cho việc check trùng size và color
+        var listDetail = []
+
+        document.querySelectorAll(".form-row").forEach(item => {
+            var color = item.querySelector('.color-select').value;
+            var size = item.querySelector('.size-select').value;
+            listDetail.push({
+                color: color,
+                size: size
+            })
+        })
+
+        var previousColorValue
+        $('.color-select').on('click', function () {
+            // Lưu giá trị hiện tại khi phần tử nhận sự tập trung (focus)
+            previousColorValue = $(this).val();
+        }).on('change', function () {
+            var currentValue = $(this).val();
+            var currentSize = $(this).closest('.form-row').find('.size-select').val();
+            if(checkDuplidateExists(currentValue, currentSize)) {
+                $(this).val(previousColorValue)
+
+            } else {
+                listDetail = listDetail.filter(item => item.color !== previousColorValue || item.size !== currentSize)
+                listDetail.push({
+                    color: currentValue,
+                    size: currentSize
+                })
+            }
+        });
+
+        var previousSizeValue
+        $('.size-select').on('click', function () {
+            // Lưu giá trị hiện tại khi phần tử nhận sự tập trung (focus)
+            previousSizeValue = $(this).val();
+        }).on('change', function () {
+            var currentValue = $(this).val();
+            var currentColor = $(this).closest('.form-row').find('.color-select').val();
+            if(checkDuplidateExists(currentColor, currentValue)) {
+                $(this).val(previousSizeValue)
+
+            } else {
+                listDetail = listDetail.filter(item => item.color !== currentColor || item.size !== previousSizeValue)
+                listDetail.push({
+                    color: currentColor,
+                    size: currentValue
+                })
+            }
+        });
+
+        function checkDuplidateExists(color, size) {
+            var isdup = false
+            listDetail.forEach(item  => {
+                if(item.color == color && item.size == size) {
+                    Toastify({
+                        text: "Màu sắc và cỡ đã tồn tại",
+                        style: {
+                            color: "white",
+                            background: "red",
+                        }
+                    }).showToast();
+                    isdup = true
+                    return
+                }
+            })
+            return isdup
+        }
+
+        //XỬ LÝ THÊM THUỘC TÍNH
+        // bắt sự kiện xóa ảnh
+        var removeImageId = []
+        $('.delete-img-btn').on('click', function () {
+            const selectedImageEle = $(this).closest('.selected-file')
+            removeImageId.push(selectedImageEle.find('.exists-image').attr("data-image"))
+            selectedImageEle.remove()
+        })
+
+        // Xử lý thêm thuộc tính
+        function addItem() {
+            var template = document.querySelector('.form-table').cloneNode(true);
+            var formRows = template.querySelectorAll('.form-row');
+
+            // Update the index to ensure uniqueness for the new product detail
+            var newIndex = document.querySelectorAll('.form-table').length;
+
+            // Update the names of input fields to ensure uniqueness
+            template.querySelectorAll('input, select').forEach(function(input) {
+                var name = input.getAttribute('name');
+                if (name) {
+                    input.setAttribute('name', name.replace('productDetailList[0]', 'productDetailList[' + newIndex +']'));
+                    input.value = ''; // Clear input values if needed
+                }
+            });
+
+            template.querySelector('.product-price').value = 0
+            template.querySelector('.product-quantity').value = 0
+
+            const deleteButtonContainer = document.createElement('div')
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.classList.add('btn', 'btn-danger', 'mt-3');
+            deleteButton.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>';
+            deleteButtonContainer.appendChild(deleteButton)
+
+            template.querySelector('.form-row').appendChild(deleteButtonContainer)
+
+            document.querySelector('.m-3').appendChild(template);
+            var color = ''
+            var size = ''
+            template.querySelector(".color-select").addEventListener('change', function (e) {
+                color = e.target.value
+                if(!checkDuplicateSizeAndColor(color, size, template) && color != '' && template.querySelector(".size-select").value != '') {
+                    listDetail.push({
+                        color: color,
+                        size: size
+                    })
+                }
+            })
+
+            template.querySelector(".size-select").addEventListener('change', function (e) {
+                size = e.target.value
+                if(!checkDuplicateSizeAndColor(color, size, template) && size != '' && template.querySelector(".color-select").value != '') {
+                    listDetail.push({
+                        color: color,
+                        size: size
+                    })
+                }
+
+            })
+
+            deleteButton.onclick = function (e) {
+                document.querySelector('.m-3').removeChild(template)
+                removeDetailObj(color, size)
+            }
+
+            //Call generateRandomBarcode
+            template.querySelector('.barcode-select').value = generateRandomBarcode()
+
+        }
+
+        function generateRandomBarcode() {
+            return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+        }
+
+        function removeDetailObj(color, size) {
+
+            listDetail = listDetail.filter(function (obj) {
+                return obj.color !== color || obj.size !== size;
+            });
+        }
+
+        function checkDuplicateSizeAndColor(color, size, template) {
+            listDetail.forEach(item => {
+                if(item.color == color && item.size == size) {
+                    document.querySelector('.m-3').removeChild(template)
+                    Toastify({
+                        text: "Màu sắc và cỡ đã tồn tại",
+                        style: {
+                            color: "white",
+                            background: "red",
+                        }
+                    }).showToast();
+                    return true
+                }
+            })
+            return false
+        }
+
+
+        //Handle file input
+        const fileInput = document.getElementById("file-input")
+        fileInput.addEventListener('change', (e) => displaySelectedImages(e))
+        const selectedFileNames = new Set();
+        var fileSend = [];
+        function displaySelectedImages(event) {
+            const selectedImagesContainer = document.getElementById('selected-images');
+
+            const files = event.target.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                // Check if the selected file is an image
+                if (file.type.startsWith('image/')) {
+                    const fileSizeInMB = file.size / (1024 * 1024);
+                    if(fileSizeInMB > 3) {
+                        swal("Lỗi", "Vui lòng chọn ảnh có dung lượng < 3MB")
+                    } else  {
+                        const fileName = file.name
+                        if (!selectedFileNames.has(fileName))
+                        {
+                            if($('.selected-file').length > 4) {
+                                Swal.fire("Lỗi", "Bạn chỉ được thêm tối đa 5 ảnh", 'error')
+                                return
+                            }
+
+                            fileSend.push(file);
+                            const reader = new FileReader();
+
+                            reader.onload = function (e) {
+                                // Create a new div for the image
+                                const imageDiv = document.createElement('div');
+                                imageDiv.className = 'selected-file me-2';
+
+                                // Create an image element
+                                const image = document.createElement('img');
+                                image.src = e.target.result;
+                                image.alt = 'Selected Image';
+                                image.width = 100;
+                                image.height = 120;
+
+                                // Create a div for file details
+
+
+                                // Create a button to remove the image
+                                const removeButton = document.createElement('div');
+                                removeButton.innerHTML = `<div class="file-details">
+                                            <span class="text-danger">
+                                                <i class="fas fa-times-circle"></i>
+                                            </span>
+                                        </div>`
+                                removeButton.onclick = function () {
+                                    // Remove the selected image when the button is clicked
+                                    selectedImagesContainer.removeChild(imageDiv);
+                                };
+                                // Append the image and remove button to the div
+                                imageDiv.appendChild(image);
+                                imageDiv.appendChild(removeButton);
+
+                                // Append the image div to the selectedImagesContainer
+                                selectedImagesContainer.appendChild(imageDiv);
+                            };
+
+                            reader.readAsDataURL(file);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        //============================= XỬ LÝ SUBMIT FORM =====================================
+        //=====================================================================================
+        document.getElementById("myForm").addEventListener('submit', async function (e) {
+            e.preventDefault()
+            if($('.selected-file').length < 1) {
+                swal('Lỗi', "Vui lòng chọn ít nhất một hình ảnh", "error")
+                return
+            }
+            var canAdd = true
+            $('.color-select').each(function(index, item) {
+                console.log($(item).val())
+                if ($(item).val() == null) {
+                    swal("Lỗi", "Vui lòng chọn màu cho sản phẩm");
+                    canAdd = false;
+                    return false; // To break out of the loop
+                }
+            });
+
+            $('.size-select').each(function(index, item) {
+                if ($(item).val() == null) {
+                    swal("Lỗi", "Vui lòng chọn kích cỡ cho sản phẩm");
+                    canAdd = false;
+                    return false; // To break out of the loop
+                }
+            });
+            if(!canAdd) {
+                return false
+            }
+
+            var formData = new FormData(this)
+            formData.append("imageRemoveIds", removeImageId)
+            if(fileSend.length > 0) {
+                fileSend.forEach(file => formData.append("files", file))
+            }
+            await fetch("/admin/product-save-edit", {
+                method: "POST",
+                body: formData,
+            }).then((data) => {
+                Swal.fire({
+                    title: "Thông báo",
+                    text: "Sản phẩm được sửa thành công",
+                    icon: "success"
+                }).then((result) => {
+                    if(result.isConfirmed) {
+                        window.location.href = "/admin/product-all"
+                    }
+                });
+            })
+
+
+
+            // window.location = "/admin/product-all";
+
+        })
+
+        function onlyAllowNumberInput(e) {
+            const key = e.key;
+            if (key === '-') {
+                e.preventDefault();
+            }
+        }
+
+        function onlyAllowNumberInput2(e) {
+            const key = e.key;
+            const keyCode = e.keyCode || e.which;
+
+            // Allow backspace (key code 8)
+            if (keyCode === 8) {
+                return;
+            }
+
+            // Allow digits (key codes 48-57) and numpad digits (key codes 96-105)
+            if ((keyCode >= 48 && keyCode <= 57) || (keyCode >= 96 && keyCode <= 105)) {
+                return;
+            }
+
+            e.preventDefault();
+        }
+        $('.product-quantity').on('keydown', function (e) {
+            onlyAllowNumberInput(e)
+        })
+        $('.product-quantity').on('input change', function (e) {
+            if($(this).val() < 0) {
+                $(this).val(0)
+            }
+        })
+
+        $('.product-price').on('keydown', function (e) {
+            onlyAllowNumberInput2(e)
+        })
+    </script>
+
+</div>
+
+
+</body>
+</html>

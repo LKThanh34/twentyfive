@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách sản phẩm</title>
+    <style>
+
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h4>Quản lý sản phẩm</h4>
+
+    <form th:action="@{/admin/product-all}" method="GET" >
+        <div class="my-3">
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="maSanPham">Mã sản phẩm</label>
+                    <input type="text" class="form-control" id="maSanPham" name="maSanPham" placeholder="Mã sản phẩm" th:value="${maSanPham}">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="tenSanPham">Tên sản phẩm</label>
+                    <input type="text" class="form-control" id="tenSanPham" name="tenSanPham"
+                           placeholder="Tên sản phẩm" th:value="${tenSanPham}">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Nhãn hàng</label>
+                    <select class="form-select" id="nhaHang" name="nhanHang" th:value="${nhanHang}">
+                        <option th:value="null">Tất cả</option>
+                        <option th:value="${brand.id}" th:each="brand: ${listBrand}"
+                                th:text="${brand.name}" th:selected="${brand.id == brand}"></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Chất liệu</label>
+                    <select class="form-select" id="chatLieu" name="chatLieu" th:value="${chatLieu}">
+                        <option th:value="null">Tất cả</option>
+                        <option th:value="${material.id}" th:each="material: ${listMaterial}"
+                                th:text="${material.name}" th:selected="${material.id == chatLieu}"></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Thể loại</label>
+                    <select class="form-select" id="theLoai" name="theLoai" th:value="${theLoai}">
+                        <option th:value="null">Tất cả</option>
+                        <option th:value="${category.id}" th:each="category: ${listCategory}"
+                                th:text="${category.name}" th:selected="${category.id == theLoai}"></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Trạng thái</label>
+                    <select class="form-select" id="trangThai" name="trangThai" th:value="${trangThai}">
+                        <option th:value="null">Tất cả</option>
+                        <option value="1" th:text="'Còn bán'" th:selected="${trangThai == 1}"></option>
+                        <option value="2" th:text="'Ngừng bán'" th:selected="${trangThai == 2}"></option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary m-1"><i class="fa fa-search"></i> Tìm kiếm</button>
+            <a th:href="@{/admin/product-all}" class="btn btn-secondary m-1"> Hủy bỏ</a>
+        </div>
+    </form>
+
+    <a href="/admin/product-create" class="btn btn-success my-3 float-right"><i class="fa fa-plus-square"></i> <span>Thêm sản phẩm</span></a>
+<!--    <div class=" alert alert-success" style="margin-top: 80px" th:if="${successMessage != ''}" th:text="${successMessage}"></div>-->
+    <table class="table my-3">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col">Mã sản phẩm
+                <a th:href="@{/admin/product-all(page=0, sort=${sortField == 'id' && sortDirection == 'asc' ? 'id,desc' : 'id,asc'}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="sort-link">↑</a>
+                <a th:href="@{/admin/product-all(page=0, sort=${sortField == 'id' && sortDirection == 'desc' ? 'id,asc' : 'id,desc'}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="sort-link">↓</a>
+            </th>
+            <th scope="col">Tên sản phẩm
+                <a th:href="@{/admin/product-all(page=0, sort=${sortField == 'tenSanPham' && sortDirection == 'asc' ? 'tenSanPham,desc' : 'tenSanPham,asc'}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="sort-link">↑</a>
+                <a th:href="@{/admin/product-all(page=0, sort=${sortField == 'tenSanPham' && sortDirection == 'desc' ? 'tenSanPham,asc' : 'tenSanPham,desc'}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="sort-link">↓</a>
+            </th>
+            <th scope="col">Nhãn hàng
+            </th>
+            <th scope="col">Chất liệu
+                <a th:href="@{/admin/product-all(page=0, sort=${sortField == 'chatLieu' && sortDirection == 'asc' ? 'chatLieu,desc' : 'chatLieu,asc'}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="sort-link">↑</a>
+                <a th:href="@{/admin/product-all(page=0, sort=${sortField == 'chatLieu' && sortDirection == 'desc' ? 'chatLieu,asc' : 'chatLieu,desc'}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="sort-link">↓</a>
+            </th>
+            <th scope="col">Thể loại
+            </th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item :${items}">
+            <td id="productId" th:attr="onclick='displayModalProduct(\'' + ${item.idSanPham} + '\')'"><a th:href="@{'/admin/chi-tiet-san-pham/'+ ${item.maSanPham}}" th:text="${item.maSanPham}"></a></td>
+            <td id="productName" th:attr="onclick='displayModalProduct(\'' + ${item.idSanPham} + '\')'">
+                <a th:href="@{'/admin/chi-tiet-san-pham/'+ ${item.maSanPham}}" th:text="${item.tenSanPham}"></a>
+            </td>
+            <td th:text="${item.nhanHang}"></td>
+            <td th:text="${item.chatLieu}"></td>
+            <td th:text="${item.theLoai}"></td>
+            <td>
+                <span th:switch="${item.trangThai}">
+                <span th:case="0">Đang khởi tạo</span>
+                <span th:case="1">Còn bán</span>
+                <span th:case="2">Ngừng bán</span>
+            </span>
+            </td>
+
+           
+        </tr>
+        </tbody>
+    </table>
+    <div class="clearfix float-right">
+        <ul class="pagination">
+            <li th:classappend="${items.hasPrevious() ? '' : 'disabled'}" class="page-item">
+                <a th:href="@{/admin/product-all(page=0,sort=${sortField}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="page-link">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li th:classappend="${items.hasPrevious() ? '' : 'disabled'}" class="page-item">
+                <a th:href="@{/admin/product-all(page=${items.number - 1}, sort=${sortField}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="page-link">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+            <li th:classappend="${items.hasNext() ? '' : 'disabled'}" class="page-item">
+                <a th:href="@{/admin/product-all(page=${items.number + 1}, sort=${sortField}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="page-link">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+            <li th:classappend="${items.hasNext() ? '' : 'disabled'}" class="page-item">
+                <a th:href="@{/admin/product-all(page=${items.totalPages - 1}, sort=${sortField}, maSanPham=${maSanPham}, tenSanPham=${tenSanPham}, nhanHang=${nhanHang}, chatLieu=${chatLieu}, theLoai=${theLoai}, trangThai=${trangThai})}" class="page-link">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </li>
+        </ul>
+
+    </div>
+    <script th:inline="javascript">
+        $('#delete-btn').on('click', function () {
+            Swal.fire({
+                title: "Xác nhận?",
+                text: `Bạn chắc chắn muốn xóa sản phẩm này`,
+                icon: "warning",
+                showCancelButton: true,
+                cancelButtonText: 'Hủy',
+                confirmButtonText: 'Xác nhận',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const id = $(this).attr('data-product-id')
+                    var url = `/admin/product-delete/${id}`
+                    window.location.href = url
+                }
+            });
+        })
+    </script>
+</div>
+</body>
+</html>

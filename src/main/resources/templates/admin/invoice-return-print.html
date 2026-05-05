@@ -1,0 +1,188 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hóa đơn đổi trả</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        td {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+
+<div class="a">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 style="text-align: center">HÓA ĐƠN ĐỔI TRẢ</h1>
+                    <div class="invoice-title">
+                        <h4 class="float-end font-size-15"><a href="/admin/getbill-detail/3" class="badge bg-success font-size-12 ms-2" th:text="${'Hóa đơn gốc: '+ billReturnDetail.billCode}">Hóa đơn gốc: HD003</a></h4>
+                        <div class="mb-4">
+                            <h2 class="mb-1 text-muted">Mã đổi trả: [[${billReturnDetail.billReturnCode}]]</h2>
+
+                        </div>
+                        <div class="text-muted">
+                            <p class="mb-1">Tòa nhà FPT Polytechnic, Cổng số 2, 13 P. Trịnh Văn Bô</p>
+                            <p class="mb-1"><i class="uil uil-envelope-alt me-1"></i> five-shop@987.com</p>
+                            <p><i class="uil uil-phone me-1"></i> 012-345-6789</p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="text-muted">
+                                <h5 class="font-size-15 mb-2" th:if="${billReturnDetail.customerDto != null}" th:text="${billReturnDetail.customerDto.name}">Preston Miller</h5>
+                                <h5 class="font-size-15 mb-2" th:if="${billReturnDetail.customerDto == null}">Khách lẻ</h5>
+                                <p th:if="${billReturnDetail.customerDto != null}" th:text="${billReturnDetail.customerDto.phoneNumber}">001-234-5678</p>
+
+                            </div>
+                        </div>
+                        <!-- end col -->
+                        <div class="col-sm-6">
+                            <div class="text-muted text-sm-end">
+                                <div class="mt-4">
+                                    <h5 class="font-size-15 mb-1">Ngày đổi trả hàng:</h5>
+                                    <p th:text="${#temporals.format(billReturnDetail.returnDate, 'dd-MM-yyyy HH:mm')}">25/11/2023</p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- end col -->
+                    </div>
+
+                    <div class="py-2">
+                        <h5 class="font-size-15 mb-2 text-primary">Danh sách hàng trả</h5>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle table-nowrap table-centered mb-0">
+                                <thead>
+                                <tr>
+
+                                    <th>Sản phẩm</th>
+                                    <th>Màu sắc</th>
+                                    <th>Kích cỡ</th>
+                                    <th>Giá tiền</th>
+                                    <th>Số lượng</th>
+                                    <th class="text-end" style="width: 120px;">Tổng</th>
+                                </tr>
+                                </thead><!-- end thead -->
+                                <tbody>
+                                <tr th:each="item:${billReturnDetail.refundProductDtos}">
+                                    <td>
+                                        <div>
+                                            <h6 class="text-truncate font-size-14 mb-1" th:text="${item.productName}">Black Strap A012</h6>
+                                        </div>
+                                    </td>
+                                    <td th:text="${item.color}"></td>
+                                    <td th:text="${item.size}">$ 245.50</td>
+                                    <td th:text="${#numbers.formatDecimal(item.momentPriceRefund, 0, 'POINT', 0, 'COMMA')}"></td>
+                                    <td th:text="${item.quantityRefund}"></td>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(item.momentPriceRefund * item.quantityRefund, 0, 'POINT', 0, 'COMMA')}">$ 245.50</td>
+                                </tr>
+                                <!-- end tr -->
+
+                                <th:block th:if="${billReturnDetail.returnProductDtos.isEmpty() || billReturnDetail.returnProductDtos == null}">
+                                    <tr>
+                                        <th scope="row" colspan="5" class="text-end">Tổng tiền trả</th>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(total, 0, 'POINT', 0, 'COMMA')}">$732.50</td>
+                                    </tr>
+                                    <!-- end tr -->
+                                    <tr>
+                                        <th scope="row" colspan="5" class="border-0 text-end">
+                                            Phí :</th>
+                                        <td class="border-0 text-end" th:text="${billReturnDetail.percentFeeExchange}"></td>
+                                    </tr>
+                                    <!-- end tr -->
+
+                                    <!-- end tr -->
+                                    <tr>
+                                        <th scope="row" colspan="5" class="border-0 text-end">Tiền trả khách:</th>
+                                        <td class="border-0 text-end"><h4 class="m-0 fw-semibold" th:text="${#numbers.formatDecimal(total - total*billReturnDetail.percentFeeExchange/100, 0, 'POINT', 0, 'COMMA')}">$739.00</h4></td>
+                                    </tr>
+                                </th:block>
+
+                                <!-- end tr -->
+                                </tbody><!-- end tbody -->
+                            </table><!-- end table -->
+                        </div><!-- end table responsive -->
+                    </div>
+
+
+                    <div class="py-2" th:if="${!billReturnDetail.returnProductDtos.isEmpty() && billReturnDetail.returnProductDtos != null}">
+                        <h5 class="font-size-15 mb-2 text-primary">Danh sách hàng đổi</h5>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle table-nowrap table-centered mb-0">
+                                <thead>
+                                <tr>
+
+                                    <th>Sản phẩm</th>
+                                    <th>Màu sắc</th>
+                                    <th>Kích cỡ</th>
+                                    <th>Giá tiền</th>
+                                    <th>Số lượng</th>
+                                    <th class="text-end" style="width: 120px;">Tổng</th>
+                                </tr>
+                                </thead><!-- end thead -->
+                                <tbody>
+                                <tr th:each="item:${billReturnDetail.returnProductDtos}">
+                                    <td>
+                                        <div>
+                                            <h6 class="text-truncate font-size-14 mb-1" th:text="${item.productName}">Black Strap A012</h6>
+                                        </div>
+                                    </td>
+                                    <td th:text="${item.color}"></td>
+                                    <td th:text="${item.size}">$ 245.50</td>
+                                    <td th:text="${#numbers.formatDecimal(item.momentPriceExchange, 0, 'POINT', 0, 'COMMA')}"></td>
+                                    <td th:text="${item.quantityReturn}"></td>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(item.momentPriceExchange * item.quantityReturn, 0, 'POINT', 0, 'COMMA')}">$ 245.50</td>
+                                </tr>
+                                <!-- end tr -->
+
+                                <tr>
+                                    <th scope="row" colspan="5" class="border-0 text-end">Tổng tiền trả</th>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(total, 0, 'POINT', 0, 'COMMA')}">$732.50</td>
+                                </tr>
+                                <!-- end tr -->
+                                <tr>
+                                    <th scope="row" colspan="5" class="border-0 text-end">
+                                        Phí :</th>
+                                    <td class="border-0 text-end" th:text="${billReturnDetail.percentFeeExchange}"></td>
+                                </tr>
+                                <!-- end tr -->
+                                <tr>
+                                    <th scope="row" colspan="5" class="border-0 text-end">Tổng tiền đổi</th>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(totalReturn, 0, 'POINT', 0, 'COMMA')}">$732.50</td>
+                                </tr>
+                                <!-- end tr -->
+                                <tr th:if="${totalReturn > (total - total*billReturnDetail.percentFeeExchange/100)}">
+                                    <th scope="row" colspan="5" class="border-0 text-end">Tiền khách trả</th>
+                                    <td class="border-0 text-end"><h4 class="m-0 fw-semibold" th:text="${#numbers.formatDecimal(totalReturn - (total - total*billReturnDetail.percentFeeExchange/100), 0, 'POINT', 0, 'COMMA')}">$739.00</h4></td>
+                                </tr>
+
+                                <tr th:if="${totalReturn <= (total - total*billReturnDetail.percentFeeExchange/100)}">
+                                    <th scope="row" colspan="5" class="border-0 text-end">Tiền trả khách</th>
+                                    <td class="border-0 text-end"><h4 class="m-0 fw-semibold" th:text="${#numbers.formatDecimal((total - total*billReturnDetail.percentFeeExchange/100) - totalReturn, 0, 'POINT', 0, 'COMMA')}">$739.00</h4></td>
+                                </tr>
+                                <!-- end tr -->
+                                </tbody><!-- end tbody -->
+                            </table><!-- end table -->
+                        </div><!-- end table responsive -->
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div><!-- end col -->
+    </div>
+</div>
+
+</body>
+</html>

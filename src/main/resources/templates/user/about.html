@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{user/layout-user.html}">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Title</title>
+
+    <link rel="icon" type="image/png" th:href="@{/images/icons/favicon.png}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/fonts/font-awesome-4.7.0/css/font-awesome.min.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/fonts/iconic/css/material-design-iconic-font.min.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/fonts/linearicons-v1.0.0/icon-font.min.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vendor/animate/animate.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vendor/css-hamburgers/hamburgers.min.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vendor/animsition/css/animsition.min.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vendor/select2/select2.min.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vendor/perfect-scrollbar/perfect-scrollbar.css}"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/util.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+
+</head>
+<body>
+
+
+    <div layout:fragment="content">
+
+        <!-- Title page -->
+        <section class="bg-img1 txt-center p-lr-15 p-tb-92" style="background-image: url('images/bg-01.jpg');">
+            <h2 class="ltext-105 cl0 txt-center">
+                About
+            </h2>
+        </section>
+
+
+        <!-- Content page -->
+        <section class="bg0 p-t-75 p-b-120">
+            <div class="container">
+                <div class="row p-b-148">
+                    <div class="col-md-7 col-lg-8">
+                        <div class="p-t-7 p-r-85 p-r-15-lg p-r-0-md">
+                            <h3 class="mtext-111 cl2 p-b-16">
+                                Về chúng tôi
+                            </h3>
+
+                            <p class="stext-113 cl6 p-b-26">
+                                Chào mừng đến với thế giới của chúng tôi - nơi mà thời trang trở nên sống động và cá nhân hóa. Chúng tôi là một cửa hàng quần áo cam kết mang đến cho bạn những trải nghiệm mua sắm thú vị và độc đáo.                            </p>
+
+                            <p class="stext-113 cl6 p-b-26">
+                                Tại cửa hàng của chúng tôi, chúng tôi không chỉ bán quần áo mà còn chia sẻ câu chuyện về phong cách và cái đẹp. Mỗi bộ sưu tập được chọn lọc đều mang đến sự đa dạng và sáng tạo, từ những bộ trang phục thường ngày đến những thiết kế đặc biệt cho những dịp quan trọng.                            </p>
+
+                            <p class="stext-113 cl6 p-b-26">
+                                Bạn có câu hỏi nào? Vui lòng liên hệ cửa hàng tại Tòa nhà FPT Polytechnic, Cổng số 2, 13 P. Trịnh Văn Bô
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-11 col-md-5 col-lg-4 m-lr-auto">
+                        <div class="how-bor1 ">
+                            <div class="hov-img0">
+                                <img src="images/about-01.jpg" alt="IMG">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="order-md-2 col-md-7 col-lg-8 p-b-30">
+                        <div class="p-t-7 p-l-85 p-l-15-lg p-l-0-md">
+                            <h3 class="mtext-111 cl2 p-b-16">
+                                Sứ mệnh
+                            </h3>
+
+                            <p class="stext-113 cl6 p-b-26">
+                                Tại cửa hàng quần áo của chúng tôi, sứ mệnh không chỉ là bán đồ, mà là tạo ra những trải nghiệm thú vị và ý nghĩa cho khách hàng. Chúng tôi không chỉ cung cấp những bộ trang phục xuất sắc, mà còn truyền tải một thông điệp, một cái nhìn về phong cách và tự tin.                            </p>
+
+                            <div class="bor16 p-l-29 p-b-9 m-t-22">
+                                <p class="stext-114 cl6 p-r-40 p-b-11">
+                                    Sứ mệnh của chúng tôi là làm cho mỗi khách hàng trở thành phiên bản tốt nhất của chính mình. Chúng tôi tin rằng bản thân mình là một tác phẩm nghệ thuật, và quần áo là công cụ để tỏa sáng. Chúng tôi khát khao mang đến cho mọi người không chỉ là những bộ trang phục đẹp mắt, mà còn là niềm tin vào bản thân và khả năng thể hiện cá tính.                                </p>
+
+                                <span class="stext-111 cl8">
+								- Mr.Sang
+							</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-md-1 col-11 col-md-5 col-lg-4 m-lr-auto p-b-30">
+                        <div class="how-bor2">
+                            <div class="hov-img0">
+                                <img src="images/about-02.jpg" alt="IMG">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Back to top -->
+        <div class="btn-back-to-top" id="myBtn">
+		<span class="symbol-btn-back-to-top">
+			<i class="zmdi zmdi-chevron-up"></i>
+		</span>
+        </div>
+    </div>
+
+
+<!--===============================================================================================-->
+<script th:src="@{/vendor/jquery/jquery-3.2.1.min.js}"></script>
+<!--===============================================================================================-->
+<script th:src="@{/vendor/animsition/js/animsition.min.js}"></script>
+<!--===============================================================================================-->
+<script th:src="@{/vendor/bootstrap/js/popper.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.min.js}"></script>
+<!--===============================================================================================-->
+<script th:src="@{/vendor/select2/select2.min.js}"></script>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $(".js-select2").each(function(){
+            $(this).select2({
+                minimumResultsForSearch: 20,
+                dropdownParent: $(this).next('.dropDownSelect2')
+            });
+        });
+    });
+</script>
+<!--===============================================================================================-->
+<script th:src="@{/vendor/MagnificPopup/jquery.magnific-popup.min.js}"></script>
+<!--===============================================================================================-->
+<script th:src="@{/vendor/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('.js-pscroll').each(function(){
+            $(this).css('position','relative');
+            $(this).css('overflow','hidden');
+            var ps = new PerfectScrollbar(this, {
+                wheelSpeed: 1,
+                scrollingThreshold: 1000,
+                wheelPropagation: false,
+            });
+
+            $(window).on('resize', function(){
+                ps.update();
+            });
+        });
+    });
+</script>
+<!--===============================================================================================-->
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

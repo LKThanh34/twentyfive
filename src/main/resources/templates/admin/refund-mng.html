@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="main-wrapper" layout:fragment="content">
+        <h4 class="mb-3">Các đơn hoàn tiền</h4>
+        <div class="alert alert-success" th:if="${successMessage != null}" th:text="${successMessage}"></div>
+<!--        <div class="m-3">-->
+<!--            <div class="form-row">-->
+<!--                <div class="form-group col-md-2">-->
+<!--                    <label for="maDinhDanh">Mã hóa đơn</label>-->
+<!--                    <input type="text" class="form-control" id="maDinhDanh" name="maDinhDanh" placeholder="Mã hóa đơn" th:value="${maHoaDon}">-->
+<!--                </div>-->
+<!--                <div class="form-group col-md-2">-->
+<!--                    <label for="ngayTaoStart">Bắt đầu</label>-->
+<!--                    <input type="date" class="form-control" id="ngayTaoStart" name="ngayTaoStart" placeholder="Bắt đầu">-->
+<!--                </div>-->
+<!--                <div class="form-group col-md-2">-->
+<!--                    <label for="ngayTaoEnd">Kết thúc</label>-->
+<!--                    <input type="date" class="form-control" id="ngayTaoEnd" name="ngayTaoEnd" placeholder="Kết thúc">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <table class="table my-3" id="refund-table">
+            <thead class="thead-light">
+            <tr>
+                <th>Hóa đơn</th>
+                <th>Mã giao dịch</th>
+                <th>Khách hàng</th>
+                <th>Ngày hủy</th>
+                <th>Số tiền</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="refund: ${refundList}">
+                    <td>
+                        <a class="font-weight-bold text-primary" th:href="@{'/admin/getbill-detail/' + ${refund.billId}}" th:text="${refund.billCode}">
+                        </a>
+                    </td>
+                    <td th:text="${refund.orderId}">
+                    </td>
+                    <td th:text="${refund.customerName}"></td>
+<!--                    <td >-->
+<!--                         <span th:if="${refund.paymentName == 'THE'}">-->
+<!--                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#f5b836" d="M2 15v-3h3v-2l4 3.5L5 17v-2H2m20-6.3V10H10V8.7L16 5l6 3.7M10 17h12v2H10v-2m5-6h2v5h-2v-5m-4 0h2v5h-2v-5m8 0h2v5h-2v-5Z"/></svg>-->
+<!--                    &nbsp;Thẻ-->
+<!--                </span>-->
+<!--                        <span th:if="${refund.paymentName == 'CHUYEN_KHOAN'}">-->
+<!--                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#f5b836" d="M2 15v-3h3v-2l4 3.5L5 17v-2H2m20-6.3V10H10V8.7L16 5l6 3.7M10 17h12v2H10v-2m5-6h2v5h-2v-5m-4 0h2v5h-2v-5m8 0h2v5h-2v-5Z"/></svg>-->
+<!--                    &nbsp;Chuyển khoản-->
+<!--                </span>-->
+<!--                        <span th:if="${refund.paymentName == 'TIEN_MAT'}">-->
+<!--                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="green" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19 22v-7.1a7 7 0 0 0-2.052-4.95L14.998 8v6.587c0 .89-1.077 1.337-1.707.707L11.996 14c-.5-.5-1.701-.8-2.502 0c-.8.8-.5 2 0 2.5l5.504 5.5"/><path d="M11 2h2a2 2 0 0 1 2 2v2m-4-4c0 1.333.8 4 4 4m-4-4H9m6 4v6M5 12v2a2 2 0 0 0 2 2h2c0-1.333-.8-4-4-4zm0 0V6m4-4H7a2 2 0 0 0-2 2v2m4-4c0 1.333-.8 4-4 4"/><circle cx="10" cy="9" r="1" transform="rotate(90 10 9)"/></g></svg>-->
+<!--                    &nbsp;Tiền mặt-->
+<!--                </span>-->
+<!--                    </td>-->
+                    <td th:text="${#temporals.format(refund.cancelDate, 'dd-MM-yyyy HH:mm')}"></td>
+                    <td th:text="${#numbers.formatDecimal(refund.totalAmount, 0, 'POINT', 0, 'COMMA')}"></td>
+                    <td >
+                        <span class="badge badge-pill bg-warning inv-badge" th:if="${refund.statusExchange == 0}">Chưa hoàn tiền</span>
+                        <span class="badge badge-pill bg-success inv-badge" th:if="${refund.statusExchange == 1}">Đã hoàn tiền</span>
+                    </td>
+                    <td>
+                        <form th:action="@{'/admin/confirm-refund/' + ${refund.orderId}}" method="post">
+                            <button type="submit" class="btn btn-success rounded" th:if="${refund.statusExchange!= null && refund.statusExchange==0}">Xác nhận</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <script>
+            new DataTable('#refund-table', {
+                order: [],
+                language: {
+                    search: "Tìm kiếm:",
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi 1 trang",
+                    "zeroRecords": "Không tìm thấy bản ghi nào",
+                    "info": "Hiển thị trang _PAGE_ trong _PAGES_",
+                    "paginate": {
+                        "first":      "<<",
+                        "last":       ">>",
+                        "next":       ">",
+                        "previous":   "<"
+                    },
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

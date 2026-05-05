@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<body>
+<div class="main-wrapper" layout:fragment="content">
+
+  <div class="page-wrapper">
+    <div class="content container-fluid">
+      <div class="page-header">
+        <div class="row">
+          <div class="col-sm-12 mt-3">
+            <h3 class="page-title mt-3">Xin chào</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item active">Dashboard</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xl-3 col-sm-6 col-12">
+          <div class="card board1 fill">
+            <div class="card-body">
+              <div class="dash-widget-header">
+                <div>
+                  <h3 class="card_widget_header" th:text="${totalBillQuantity}"></h3>
+                  <h6 class="text-muted">Tổng lượt đặt hàng</h6> </div>
+                <div class="ml-auto mt-md-3 mt-lg-0"> <span class="opacity-7 text-muted"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus">
+									<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+									<circle cx="8.5" cy="7" r="4"></circle>
+									<line x1="20" y1="8" x2="20" y2="14"></line>
+									<line x1="23" y1="11" x2="17" y2="11"></line>
+									</svg></span> </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+          <div class="card board1 fill">
+            <div class="card-body">
+              <div class="dash-widget-header">
+                <div>
+                  <h3 class="card_widget_header" th:text="${totalBillWaiting}">2</h3>
+                  <h6 class="text-muted">Số đơn chờ xử lý</h6> </div>
+                <div class="ml-auto mt-md-3 mt-lg-0"> <span class="opacity-7 text-muted"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign">
+									<line x1="12" y1="1" x2="12" y2="23"></line>
+									<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+									</svg></span> </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+          <div class="card board1 fill">
+            <div class="card-body">
+              <div class="dash-widget-header">
+                <div>
+                  <h3 class="card_widget_header" th:text="${#numbers.formatDecimal(revenue, 0, 'POINT', 0, 'COMMA')}">1.400.000 đ</h3>
+                  <h6 class="text-muted">Tổng doanh thu</h6> </div>
+                <div class="ml-auto mt-md-3 mt-lg-0"> <span class="opacity-7 text-muted"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-plus">
+									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z">
+									</path>
+									<polyline points="14 2 14 8 20 8"></polyline>
+									<line x1="12" y1="18" x2="12" y2="12"></line>
+									<line x1="9" y1="15" x2="15" y2="15"></line>
+									</svg></span> </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+          <div class="card board1 fill">
+            <div class="card-body">
+              <div class="dash-widget-header">
+                <div>
+                  <h3 class="card_widget_header" th:text="${totalProduct}">10</h3>
+                  <h6 class="text-muted">Số sản phẩm</h6> </div>
+                <div class="ml-auto mt-md-3 mt-lg-0"> <span class="opacity-7 text-muted"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe">
+									<circle cx="12" cy="12" r="10"></circle>
+									<line x1="2" y1="12" x2="22" y2="12"></line>
+									<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+									</path>
+									</svg></span> </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 col-lg-6">
+          <div class="card card-chart">
+            <div class="card-header">
+              <h4 class="card-title">Người dùng</h4> </div>
+            <div class="card-body">
+              <canvas id="user-chart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 col-lg-6">
+          <div class="card card-chart">
+            <div class="card-header">
+              <h4 class="card-title">Đơn hàng</h4> </div>
+            <div class="card-body">
+              <canvas id="donut-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 d-flex">
+          <div class="card card-table flex-fill">
+            <div class="card-header">
+              <h4 class="card-title float-left mt-2">Đơn mới nhất</h4>
+              <a th:href="@{/admin/bill-list}" class="btn btn-primary float-right veiwbutton">Xem tất cả</a>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover table-center">
+                  <thead>
+                  <tr>
+                    <th>Mã hóa đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th class="text-center">Loại đơn</th>
+                    <th class="text-right">Hình thức thanh toán</th>
+                    <th class="text-center">Trạng thái</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="bill : ${billList}">
+                    <td class="text-nowrap">
+                      <div th:text="${bill.code}"></div>
+                    </td>
+                    <td class="text-nowrap" th:if="${bill.customer != null}" th:text="${bill.customer.name}"></td>
+                    <td class="text-nowrap text-muted font-italic" th:if="${bill.customer == null}">Khách lẻ</td>
+                    <td th:text="${#temporals.format(bill.createDate, 'dd-MM-yyyy HH:mm')}"></td>
+                    <td>
+                      <span th:if="${bill.invoiceType == T(com.project.DuAnTotNghiep.entity.enumClass.InvoiceType).OFFLINE}">Tại quầy</span>
+                      <span th:if="${bill.invoiceType == T(com.project.DuAnTotNghiep.entity.enumClass.InvoiceType).ONLINE}">Online</span>
+                    </td>
+                    <td class="text-center" th:text="${bill.paymentMethod.name}"></td>
+                    <td class="text-center" th:if="${bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).CHO_GIAO_HANG}"> <span class="badge badge-pill bg-warning inv-badge" >Chờ giao hàng</span> </td>
+                    <td class="text-center" th:if="${bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).CHO_LAY_HANG}"> <span class="badge badge-pill bg-primary inv-badge" >Chờ lấy hàng</span> </td>
+                    <td class="text-center" th:if="${bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).CHO_XAC_NHAN}"> <span class="badge badge-pill bg-secondary inv-badge">Chờ xác nhận</span> </td>
+                    <td class="text-center" th:if="${bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).HOAN_THANH}"> <span class="badge badge-pill bg-success inv-badge" >Hoàn thành</span> </td>
+                    <td class="text-center" th:if="${bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).HUY}"> <span class="badge badge-pill bg-danger inv-badge">Hủy</span> </td>
+                    <td class="text-center" th:if="${bill.status == T(com.project.DuAnTotNghiep.entity.enumClass.BillStatus).TRA_HANG}"> <span class="badge badge-pill bg-dark inv-badge">Hoàn trả</span> </td>
+
+                  </tr>
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    $(document).ready(function () {
+      /* Lấy dữ liệu thống kê từ model của Spring */
+      let userStatistics = [];
+      /* Chuyển đổi dữ liệu thành các mảng cho biểu đồ */
+
+
+      getData()
+      callApiStatisticOrder()
+
+      async function getData() {
+        await $.ajax({
+          type: 'GET',
+          dataType: 'json',
+          url: '/get-statistic-user-by-month',
+          success: function (list) {
+            userStatistics = list;
+            let labels = [];
+            let data = [];
+            for (let i = 0; i < list.length; i++) {
+              labels.push(list[i].month);
+              data.push(list[i].userCount);
+            }
+            loadUserChart(labels, data)
+          }
+        })
+      }
+
+      async function callApiStatisticOrder() {
+        await $.ajax({
+          type: 'GET',
+          dataType: 'json',
+          url: '/api/get-statistic-order',
+          success: function (list) {
+            var labels = [];
+            var data = [];
+            for (var i = 0; i < list.length; i++) {
+              switch (list[i].status) {
+                case 'CHO_XAC_NHAN' :
+                  labels.push('Chờ xác nhận');
+                  break;
+                case 'CHO_LAY_HANG' :
+                  labels.push('Chờ lấy hàng');
+                  break;
+                case 'CHO_GIAO_HANG' :
+                  labels.push('Chờ giao hàng');
+                  break;
+
+                case 'HOAN_THANH' :
+                  labels.push('Hoàn thành');
+                  break;
+                case 'TRA_HANG' :
+                  labels.push('Trả hàng');
+                  break;
+              }
+              data.push(list[i].quantity);
+            }
+            loadOrderChart(labels, data)
+          }
+        })
+      }
+
+      function loadUserChart(labels, data) {
+        /* Vẽ biểu đồ bằng Chart.js */
+        var ctx = document.getElementById('user-chart')
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Người dùng',
+              data: data,
+              backgroundColor: 'rgba(0, 123, 255, 0.5)',
+              borderColor: 'rgba(0, 123, 255, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                precision: 0,
+                ticks: {
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function loadOrderChart(labels, data) {
+        var ctx2 = document.getElementById('donut-chart')
+        new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Đơn hàng',
+              data: data,
+
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                precision: 0
+              }
+            }
+          }
+        });
+      }
+    })
+  </script>
+</div>
+
+</body>
+
+</html>

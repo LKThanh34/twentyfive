@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="custom-modal" id="add-color-modal">
+        <div class="modal-content rounded">
+            <span class="close" >&times;</span>
+            <div class="modal-header mb-1">
+                <h5>Thêm màu mới</h5>
+            </div>
+            <form id="color-form">
+                <div class="form-group">
+                    <label for="colorCode">Mã màu:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="colorCode" id="colorCode" placeholder="Nhập mã màu">
+                    <span class="error"></span>
+                    <!-- Add more fields as needed -->
+                </div>
+
+                <div class="form-group">
+                    <label for="sizeName">Tên màu:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="colorName" id="colorName" placeholder="Nhập tên màu">
+                    <span class="error"></span>
+                    <!-- Add more fields as needed -->
+                </div>
+                <button class="btn btn-primary mt-2 w-100" id="save-color-btn">Lưu</button>
+            </form>
+
+        </div>
+    </div>
+
+
+    <div class="custom-modal" id="add-size-modal">
+        <div class="modal-content rounded">
+            <span class="close" >&times;</span>
+            <div class="modal-header mb-1">
+                <h5>Thêm kích cỡ mới</h5>
+            </div>
+            <form id="size-form">
+                <div class="form-group">
+                    <label for="sizeCode">Mã kích cỡ:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="sizeCode" id="sizeCode" placeholder="Nhập mã kích cỡ">
+                    <span class="error"></span>
+                    <!-- Add more fields as needed -->
+                </div>
+
+                <div class="form-group">
+                    <label for="colorName">Tên cỡ:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="sizeName" id="sizeName" placeholder="Nhập tên cỡ">
+                    <span class="error"></span>
+                    <!-- Add more fields as needed -->
+                </div>
+                <button class="btn btn-primary mt-2 w-100" id="save-size-btn">Lưu</button>
+            </form>
+
+        </div>
+    </div>
+
+
+    <h4>Thông tin sản phẩm chi tiết</h4>
+    <form th:object="${form}" th:method="post" th:action="@{/admin/product-save}" enctype="multipart/form-data" id="myForm">
+        <div class="my-3 attr-list" >
+            <div class="form-table" th:each="productDetail, iterStat : *{productDetailList}">
+                <div class="form-row align-items-center">
+                    <div class="form-group col-md-2">
+                        <label>Barcode</label>
+                        <input type="text" class="form-control barcode-select" th:field="*{productDetailList[__${iterStat.index}__].barcode}" placeholder="VD:1234" readonly required>
+                    </div>
+                    <div class="form-group col-md-2">
+                       <div class="select-container">
+                           <label>Màu sắc</label>
+                           <span class="red_require"> *</span>
+                           <select class="form-select color-select" th:field="*{productDetailList[__${iterStat.index}__].color}">
+                               <option th:each="color: ${listColor}" th:value="${color.id}" th:text="${color.name}"></option>
+                           </select>
+                           <span class="plus-icon"><i class="add-color fas fa-plus"></i></span>
+                       </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <div class="select-container">
+                            <label>Kích cỡ</label>
+                            <span class="red_require"> *</span>
+                            <select class="form-select size-select" th:field="*{productDetailList[__${iterStat.index}__].size}">
+                                <option th:each="size: ${listSize}" th:value="${size.id}" th:text="${size.name}"></option>
+                            </select>
+                            <span class="plus-icon"><i class="add-size fas fa-plus"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Số lượng</label>
+                        <span class="red_require"> *</span>
+                        <input type="number" class="form-control product-quantity" th:field="*{productDetailList[__${iterStat.index}__].quantity}" required>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Giá tiền</label>
+                        <span class="red_require"> *</span>
+                        <input type="text" class="form-control product-price" th:field="*{productDetailList[__${iterStat.index}__].price}" required>
+                    </div>
+                </div>
+
+<!--                <div class="form-row">-->
+<!--                   -->
+<!--                </div>-->
+            </div>
+        </div>
+        <div class="form-row ml-2">
+            <div class="form-group">
+                <button type="button" class="btn btn-danger  rounded" id="add-attr-btn">Thêm thuộc tính</button>
+            </div>
+        </div>
+        <div class="form-section">
+            <h2 class="title">Hình ảnh</h2>
+            <label class="control-label">
+                Chọn 1 hoặc nhiều hình ảnh
+            </label>
+            <div class="image-group d-flex">
+                <div class="selected-files d-flex" id="selected-images">
+
+                </div>
+                <div class="image-upload">
+                    <label for="file-input" class="label-select-img">
+                        <i class="fa fa-plus"></i>
+                    </label>
+                    <input id="file-input"  type="file" multiple accept="image/*" />
+                </div>
+            </div>
+        </div>
+        <button type="submit" id="save-btn" class="btn btn-primary m-1 rounded"><i class="fa ti-save"></i> Lưu lại</button>
+        <a href="/admin/product-all" class="btn btn-secondary m-1 rounded"><i class="fa fa-mail-reply (alias)"></i>
+            <span>Hủy</span></a>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js" th:inline="javascript"></script>
+    <script th:inline="javascript">
+
+        $(document).ready(function () {
+            var parentPlus;
+
+            // $('#save-btn').on('click', function () {
+            //     $('#myForm').submit()
+            //     Swal.fire({
+            //         title: 'Thêm sản phẩm thành công',
+            //         text: 'Bạn có muốn tiếp tục thêm không',
+            //         icon: 'success',
+            //         showCancelButton: true,
+            //         confirmButtonText: 'Tiếp tục thiết lập',
+            //         cancelButtonText: 'Quay lại trang danh sách'
+            //     }).then((result) => {
+            //         if (result.isConfirmed) {
+            //             // Chuyển trang khi người dùng nhấn "OK"
+            //             window.location.href = '/admin/product-create'
+            //         } else {
+            //             window.location.href = '/admin/product-all'
+            //         }
+            //     });
+            // })
+
+            $('.add-color').on('click', function () {
+                $('#add-color-modal').show()
+                parentPlus = $(this).closest('.select-container').find('.color-select')
+            })
+
+            $('.add-size').on('click', function () {
+                $('#add-size-modal').show()
+                parentPlus = $(this).closest('.select-container').find('.size-select')
+            })
+
+            //VALIDATE CATEGORY
+            Validator({
+                form: '#color-form',
+                formGroupSelector: '.form-group',
+                errorSelector: '.error',
+                rules: [
+                    Validator.isRequired('#colorCode', 'Vui lòng nhập mã màu'),
+                    Validator.isRequired('#colorName', 'Vui lòng nhập tên màu'),
+                    Validator.maxLength('#colorName', 30),
+                    Validator.maxLength('#colorCode', 20)
+                ],
+                onSubmit: async function (data) {
+                    var dataSend = {
+                        code: data.colorCode,
+                        name: data.colorName
+                    }
+                    await $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(dataSend),
+                        url: '/api/color',
+
+                        success: function (data) {
+                            $("#add-color-modal").hide()
+                            $('.color-select').append(`<option value="${data.id}">${data.name}</option>`)
+                            parentPlus.val(`${data.id}`).trigger('change')
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Lỗi",
+                                text: xhr.responseJSON.message,
+                                icon: "error"
+                            });
+                        }
+                    })
+                }
+            });
+
+            //VALIDATE CATEGORY
+            Validator({
+                form: '#size-form',
+                formGroupSelector: '.form-group',
+                errorSelector: '.error',
+                rules: [
+                    Validator.isRequired('#sizeCode', 'Vui lòng nhập mã kích cỡ'),
+                    Validator.isRequired('#sizeName', 'Vui lòng nhập tên kích cỡ'),
+                    Validator.maxLength('#sizeName', 30),
+                    Validator.maxLength('#sizeCode', 20)
+                ],
+                onSubmit: async function (data) {
+                    var dataSend = {
+                        code: data.sizeCode,
+                        name: data.sizeName
+                    }
+                    await $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(dataSend),
+                        url: '/api/size',
+
+                        success: function (data) {
+                            $("#add-size-modal").hide()
+                            $('.size-select').append(`<option value="${data.id}">${data.name}</option>`)
+                            parentPlus.val(`${data.id}`).trigger('change')
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Lỗi",
+                                text: xhr.responseJSON.message,
+                                icon: "error"
+                            });
+                        }
+                    })
+                }
+            });
+
+            $('.close').on('click', function () {
+                $(this).closest('.custom-modal').hide()
+            })
+
+
+            function onlyAllowNumberInput(e) {
+                const key = e.key;
+                if (key === '-') {
+                    e.preventDefault();
+                }
+            }
+
+            function onlyAllowNumberInput2(e) {
+                const key = e.key;
+                const keyCode = e.keyCode || e.which;
+
+                // Allow backspace (key code 8)
+                if (keyCode === 8) {
+                    return;
+                }
+
+                // Allow digits (key codes 48-57) and numpad digits (key codes 96-105)
+                if ((keyCode >= 48 && keyCode <= 57) || (keyCode >= 96 && keyCode <= 105)) {
+                    return;
+                }
+
+                e.preventDefault();
+            }
+            $('.product-quantity').on('keydown', function (e) {
+                onlyAllowNumberInput(e)
+            })
+            $('.product-quantity').on('input change', function (e) {
+                if($(this).val() < 0) {
+                    $(this).val(0)
+                }
+            })
+
+            $('.product-price').on('keydown', function (e) {
+                onlyAllowNumberInput2(e)
+            })
+
+            // $('.product-price').on('focusout', function (e) {
+            //     if($(this).val() == "") {
+            //         $(this).val(0)
+            //     }
+            // })
+
+            //Handle add product detail
+            document.querySelector('.product-price').value = 0
+            var listDetail = []
+            var detail = {}
+            var colorFirst = 1
+            var sizeFirst = 1
+            detail.color = colorFirst
+            detail.size = sizeFirst
+            listDetail.push(detail)
+            $(".color-select").first().on('change', function (e) {
+                colorFirst = $(this).val()
+                if(colorFirst != '' && $(".size-select").val() != '') {
+                    listDetail[0].color = colorFirst
+                    listDetail[0].size = $(".size-select").val()
+                }
+            })
+
+           $(".size-select").first().on('change', function (e) {
+                sizeFirst = $(this).val()
+                if(sizeFirst != '' && $(".color-select").val() != '') {
+                    listDetail[0].color = $(".color-select").val()
+                    listDetail[0].size = sizeFirst
+                }
+
+            })
+
+            function generateRandomBarcode() {
+                return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+            }
+
+            // Autofill barcode when the page loads
+            $('.barcode-select').val(generateRandomBarcode());
+
+
+
+            $('#add-attr-btn').on('click', addItem)
+            function addItem() {
+                var detailId = detail.id + 1;
+                var template = document.querySelector('.form-table').cloneNode(true);
+                var formRows = template.querySelectorAll('.form-row');
+
+                // Update the index to ensure uniqueness for the new product detail
+                var newIndex = document.querySelectorAll('.form-table').length;
+
+                // Update the names of input fields to ensure uniqueness
+                template.querySelectorAll('input, select').forEach(function(input) {
+                    var name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace('productDetailList[0]', 'productDetailList[' + newIndex +']'));
+                        input.value = ''; // Clear input values if needed
+                    }
+                });
+
+                template.querySelector('.product-price').value = 10000
+                template.querySelector('.product-quantity').value = 1
+
+                $('.product-quantity').on('keydown', function (e) {
+                    onlyAllowNumberInput(e)
+                })
+                $('.product-quantity').on('input change', function (e) {
+                    if($(this).val() < 0) {
+                        $(this).val(0)
+                    }
+                })
+                $('.product-price').on('keydown', function (e) {
+                    onlyAllowNumberInput2(e)
+                })
+                // $('.product-quantity').on('focusout', function (e) {
+                //     if($(this).val() == "") {
+                //         $(this).val(0)
+                //     }
+                // })
+                const deleteButtonContainer = document.createElement('div')
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.classList.add('btn', 'btn-danger', 'mt-3');
+                deleteButton.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>';
+                deleteButtonContainer.appendChild(deleteButton)
+
+                template.querySelector('.form-row').appendChild(deleteButtonContainer)
+
+                document.querySelector('.attr-list').appendChild(template);
+
+                var color = ''
+                var size = ''
+                template.querySelector(".color-select").addEventListener('change', function (e) {
+                    color = e.target.value
+                    if(!checkDuplicateSizeAndColor(color, size, template) && color != '' && template.querySelector(".size-select").value != '') {
+                        listDetail.push({
+                            color: color,
+                            size: size
+                        })
+                    }
+                })
+
+                template.querySelector(".size-select").addEventListener('change', function (e) {
+                    size = e.target.value
+                    if(!checkDuplicateSizeAndColor(color, size, template) && size != '' && template.querySelector(".color-select").value != '') {
+                        listDetail.push({
+                            color: color,
+                            size: size
+                        })
+                    }
+
+                })
+
+                deleteButton.onclick = function () {
+                    document.querySelector('.attr-list').removeChild(template)
+                    removeDetailObj(color, size)
+                }
+
+                template.querySelector('.barcode-select').value = generateRandomBarcode()
+
+                $('.add-color').on('click', function () {
+                    $('#add-color-modal').show()
+                    parentPlus = $(this).closest('.select-container').find('.color-select')
+                })
+
+                $('.add-size').on('click', function () {
+                    $('#add-size-modal').show()
+                    parentPlus = $(this).closest('.select-container').find('.size-select')
+                })
+            }
+
+            function removeDetailObj(color, size) {
+
+                listDetail = listDetail.filter(function (obj) {
+                    return obj.color !== color || obj.size !== size;
+                });
+            }
+
+            function checkDuplicateSizeAndColor(color, size, template) {
+                listDetail.forEach(item => {
+                    if(item.color == color && item.size == size) {
+                        document.querySelector('.attr-list').removeChild(template)
+                        Toastify({
+                            text: "Màu sắc và cỡ đã tồn tại",
+                            style: {
+                                color: "white",
+                                background: "red",
+                            }
+                        }).showToast();
+                        return true
+                    }
+                })
+                return false
+            }
+
+
+            //Handle file input
+            const fileInput = document.getElementById("file-input")
+            fileInput.addEventListener('change', (e) => displaySelectedImages(e))
+            const selectedFileNames = new Set();
+            var fileSend = [];
+            function displaySelectedImages(event) {
+                const selectedImagesContainer = document.getElementById('selected-images');
+
+                const files = event.target.files;
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+
+                    // Check if the selected file is an image
+                    if (file.type.startsWith('image/')) {
+                        const fileSizeInMB = file.size / (1024 * 1024);
+                        if(fileSizeInMB > 3 ) {
+                            Swal.fire("Lỗi", "Vui lòng chọn ảnh có dung lượng < 3MB", 'error')
+                        } else {
+                            const fileName = file.name
+                            if (!selectedFileNames.has(fileName))
+                            {
+                                if(fileSend.length == 5) {
+                                    Swal.fire("Lỗi", "Bạn chỉ được thêm tối đa 5 ảnh", 'error')
+                                    return
+                                }
+                                fileSend.push(file);
+                                const reader = new FileReader();
+
+                                reader.onload = function (e) {
+                                    // Create a new div for the image
+                                    const imageDiv = document.createElement('div');
+                                    imageDiv.className = 'selected-file me-2';
+
+                                    // Create an image element
+                                    const image = document.createElement('img');
+                                    image.src = e.target.result;
+                                    image.alt = 'Selected Image';
+                                    image.width = 100;
+                                    image.height = 120;
+
+                                    // Create a div for file details
+
+
+                                    // Create a button to remove the image
+                                    const removeButton = document.createElement('div');
+                                    removeButton.innerHTML = `<div class="file-details">
+                                            <span class="text-danger">
+                                                <i class="fas fa-times-circle"></i>
+                                            </span>
+                                        </div>`
+                                    removeButton.onclick = function () {
+                                        // Remove the selected image when the button is clicked
+                                        removeImage(selectedImagesContainer, imageDiv, fileName);
+
+                                    };
+
+                                    // Append the image and remove button to the div
+                                    imageDiv.appendChild(image);
+
+                                    imageDiv.appendChild(removeButton);
+
+                                    // Append the image div to the selectedImagesContainer
+                                    selectedImagesContainer.appendChild(imageDiv);
+                                };
+
+                                reader.readAsDataURL(file);
+                            }
+                        }
+
+                    }
+                }
+            }
+            function removeImage(selectedImagedContainer, imageDiv, fileName) {
+                // Remove the selected image from the UI and fileSend array
+                selectedImagedContainer.removeChild(imageDiv);
+                selectedFileNames.delete(fileName);
+                fileSend = fileSend.filter(file => file.name !== fileName);
+            }
+            document.getElementById("myForm").addEventListener('submit', async function (e) {
+                e.preventDefault()
+                if(fileSend.length < 1) {
+                    Swal.fire('Lỗi', "Vui lòng chọn ít nhất một hình ảnh", "error")
+                    return
+                }
+                var canAdd = true
+                $('.color-select').each(function(index, item) {
+                    if ($(item).val() == null) {
+                        Swal.fire("Lỗi", "Vui lòng chọn màu cho sản phẩm");
+                        canAdd = false;
+                        return false; // To break out of the loop
+                    }
+                });
+
+                $('.size-select').each(function(index, item) {
+                    if ($(item).val() == null) {
+                        swal("Lỗi", "Vui lòng chọn kích cỡ cho sản phẩm");
+                        canAdd = false;
+                        return false; // To break out of the loop
+                    }
+                });
+                if(!canAdd) {
+                    return false
+                }
+
+                var formData = new FormData(this)
+                fileSend.forEach(file => formData.append("files", file))
+                await fetch("/admin/product-save", {
+                    method: "POST",
+                    body: formData,
+                })
+
+                Swal.fire({
+                    title: 'Thêm sản phẩm thành công',
+                    text: 'Bạn có muốn tiếp tục thêm không',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'Tiếp tục thiết lập',
+                    cancelButtonText: 'Quay lại trang danh sách'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Chuyển trang khi người dùng nhấn "OK"
+                        window.location.href = '/admin/product-create'
+                    } else {
+                        window.location.href = '/admin/product-all'
+                    }
+                });
+
+                // window.location = "/admin/product-all";
+            })
+
+
+
+        })
+
+
+
+
+    </script>
+</div>
+
+
+</body>
+</html>

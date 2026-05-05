@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link th:href="@{/admin/vendors/bootstrap/dist/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/admin/vendors/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
+    <link th:href="@{/admin/vendors/themify-icons/css/themify-icons.css}" rel="stylesheet">
+    <link th:href="@{/admin/vendors/flag-icon-css/css/flag-icon.min.css}" rel="stylesheet">
+    <link th:href="@{/admin/vendors/selectFX/css/cs-skin-elastic.css}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script th:src="@{/admin/vendors/jquery/dist/jquery.min.js}"></script>
+    <script th:src="@{/admin/vendors/popper.js/dist/umd/popper.min.js}"></script>
+    <script th:src="@{/admin/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+    <!--    <script th:src="@{/admin/assets/js/jspdf.umd.min.js}"></script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">-->
+    <!--    </script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">-->
+    <!--    </script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>-->
+    <script th:src="@{/js/sweetalert.min.js}"></script>
+
+    <script th:src="@{/admin/assets/js/main.js}"></script>
+    <style>
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 4px solid #fff;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+        .pos-product:hover {
+            cursor: pointer;
+            background-color: rgba(9, 100, 207, 0.1);
+            box-shadow: 2px 2px 4px #D9D9D9;
+            border-color: rgba(9, 100, 207, 0.1);
+        }
+
+        .tab-container {
+            display: flex;
+        }
+
+        /* Styling for individual tabs */
+        .tab {
+            padding: 10px 20px;
+            background-color: #11398a;
+            border: 1px solid #ccc;
+            margin-right: 5px;
+            margin-left: 10px;
+            position: relative;
+            color: #fff;
+        }
+
+        .tab.active {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .tab-list {
+            display: flex;
+        }
+
+        /* Styling for the close button on each tab */
+        .close-tab-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+
+        /* Styling for the plus button to add new tabs */
+        .add-tab-btn {
+            background:none;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .product-select-body.active {
+            display: block;
+        }
+
+        .product-select-body {
+            display: none;
+        }
+
+        .add-customer-form {
+            display: none;
+        }
+
+        .customer-item {
+            cursor: pointer;
+        }
+
+        .customer-item.active {
+            background-color: #00ccff;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+<div id="loading-overlay">
+    <div class="loading-spinner"></div>
+</div>
+<nav class="" style="background-color: #0964CF; padding: 0 14px">
+    <div class="d-flex align-items-center">
+        <form class="form-inline">
+            <input class="form-control mr-sm-2" type="search" placeholder="Thêm sản phẩm vào đơn" aria-label="Search">
+        </form>
+        <a class="fs-5 text-white" th:href="@{/admin}"><i class="fa fa-home" aria-hidden="true"></i></a>
+        <div class="tab-container">
+            <div class="tab-list">
+                <div class="tab active">
+                    Đơn 1
+
+                </div>
+            </div>
+            <button class="add-tab-btn">
+                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-9">
+            <div class="h-75 product-select-list" style="min-height: 330px; max-height: 330px; overflow-y: auto;">
+                <div class="table-heading row align-items-center justify-content-center m-3 text-center">
+                    <div class="col-1">
+                        <h5>STT</h5>
+                    </div>
+                    <div class="col-1">
+                        <h5>Ảnh</h5>
+                    </div>
+                    <div class="col-3">
+                        <h5>Tên sản phẩm</h5>
+                    </div>
+                    <div class="col-2">
+                        <h5>Số lượng</h5>
+                    </div>
+                    <div class="col-2">
+                        <h5>Đơn giá</h5>
+                    </div>
+                    <div class="col-2">
+                        <h5>Thành tiền</h5>
+                    </div>
+                    <div class="col-1">
+
+                    </div>
+                </div>
+                <div class="product-select-content">
+                    <div class="product-select-body active"></div>
+                </div>
+            </div>
+            <div class="mt-2" style="min-height: 200px;">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab"
+                           aria-controls="home" aria-selected="true">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
+                           aria-controls="profile" aria-selected="false">Khách hàng</a>
+                    </li>
+
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <button type="button" class="btn btn-primary m-1"><i class="fa fa-filter"></i>&nbsp;
+                            </button>
+                            <a class="btn btn-primary m-1 " th:href="@{/admin/product-create}">Thêm sản phẩm</a>
+                        </div>
+                        <div class="d-flex flex-wrap">
+                            <div th:each="product: ${products}" class="d-flex">
+                                <div th:each="productDetail: ${product.productDetails}"
+                                     class="pos-product border border rounded mr-2">
+                                    <input type="hidden" th:class="detail-id" th:value="${productDetail.id}">
+                                    <div style="width: 30px; height: 30px">
+                                        <img  th:src="@{'/' + ${product.getImage().get(0).link}}"
+                                              th:alt="${product.getImage().get(0).name}"
+                                              class="rounded w-100 h-100 m-1 product-img">
+                                    </div>
+                                    <h6 class="product-name"
+                                        th:text="${product.name} + ' - ' + ${productDetail.getSize().name} +  ' - ' + ${productDetail.getColor().name}">
+                                    </h6>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="product-price" th:text="${#numbers.formatDecimal(productDetail.price, 3, 'POINT', 0, 'COMMA')}"></span>
+                                        <span class="product-quantity" th:data-select-quantity="${productDetail.quantity}" th:data-quantity="${productDetail.quantity}" th:text="'SL: '+ ${productDetail.quantity}"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="row customer-list">
+
+                        </div>
+                        <div class="btn btn-primary add-customer-btn">Thêm khách hàng+</div>
+                        <div class="add-customer-form">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="input-group m-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-phone-square"></i>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control" id="customerPhone" placeholder="Số điện thoại" aria-label="Số điện thoại"
+                                               aria-describedby="basic-addon1">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group m-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-group (alias)"></i>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control" id="customerName" placeholder="Họ tên"
+                                               aria-label="Số điện thoại" aria-describedby="basic-addon1">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="save-customer-btn" class="btn btn-primary m-1">
+                                Lưu
+                            </button>
+
+                            <button type="button" id="cancel-customer-btn" class="btn btn-outline-danger m-1">
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 border rounded" style="background-color: rgb(230, 235, 235); min-height: 700px;">
+            <div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <h5>Tổng tiền: </h5>
+                    </div>
+                    <div class="col">
+                        <h5 id="all-price">0</h5>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <h5>Voucher: </h5>
+                    </div>
+                    <div class="col">
+                        <h6 style="color: red;">Click vào để chọn</h6>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <h6>Giảm giá sản phẩm: </h6>
+                    </div>
+                    <div class="col">
+                        <h6 id="product-discount">0</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h6>Giảm giá voucher: </h6>
+                    </div>
+                    <div class="col">
+                        <h6 id="voucher-discount">0</h6>
+                    </div>
+                </div>
+                <hr>
+                <!--                <div class="row mb-3">-->
+                <!--                    <div class="col">-->
+                <!--                        <h6>Chiết khấu: </h6>-->
+                <!--                    </div>-->
+                <!--                    <div class="col">-->
+                <!--                        <h6>230.000</h6>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <div class="row mb-3">
+                    <div class="col">
+                        <h5>Khách phải trả: </h5>
+                    </div>
+                    <div class="col">
+                        <h5 style="color: red; border-bottom: 1px solid black;" id="last-price">0</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h6>Tiền khách đưa: </h6>
+                    </div>
+                    <div class="col">
+                        <input type="number" name="" id="customerPayInput">
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <h6>Tiền thừa trả khách: </h6>
+                    </div>
+                    <div class="col">
+                        <h6 id="change">0</h6>
+                    </div>
+                </div>
+                <input type="radio" th:value="1" name="paymentMethod" id="payment-offline" checked> <label >Tiền mặt</label>
+                <input type="radio" th:value="4" name="paymentMethod" id="payment-card"> <label >Thẻ</label>
+                <input type="radio" value="3" name="paymentMethod" id="payment-online"> <label >Chuyển khoản</label>
+
+                <button class="btn" id="submitBtn"
+                        style="background-color: #0964CF; color: aliceblue; width: 350px; height: 70px;" type="button">THANH
+                    TOÁN
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" th:inline="javascript"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:inline="javascript">
+        const tabList = document.querySelector(".tab-list");
+        const tabContent = document.querySelector(".product-select-content");
+        const addTabBtn = document.querySelector(".add-tab-btn");
+        var tabActiveNumber = 1
+        var posProducts = document.querySelectorAll('.pos-product')
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            $('#cancel-customer-btn').on('click', function () {
+                $('.add-customer-form').hide()
+            })
+
+            $("#customerPhone").on('keypress', function (e) {
+                var key = e.key;
+
+                // Allow numeric characters (0-9) and certain control keys (e.g., backspace)
+                if (!/[\d\b]/.test(key)) {
+                    e.preventDefault();
+                }
+            })
+
+            $('#save-customer-btn').on('click', async function () {
+                const customerName = $("#customerName").val().trim()
+                const customerPhone = $("#customerPhone").val().trim()
+                if (customerName == "" || customerPhone == "") {
+                    swal("Lỗi", "Vui lòng nhập họ tên và số điện thoại khách hàng")
+                    return
+                }
+
+                var dataSend = {
+                    name: customerName,
+                    phoneNumber: customerPhone
+                }
+
+                await $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/customer',
+                    data: JSON.stringify(dataSend),
+                    success: function (data) {
+                        $('.customer-list').append(`<div class="col-md-3 rounded border border-primary customer-item" data-customer-id="${data.id}">
+                                        <p class="customer-name" >${data.name}</p>
+                                        <p class="customer-phone">${data.phoneNumber}</p>
+                                    </div>`)
+                    },
+                    error: function (xhr, status, error) {
+                        swal("Error", xhr.responseJSON.message, "error")
+                    }
+                })
+            })
+            document.getElementById('submitBtn').addEventListener('click', generateAndPrintPDF);
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: '/api/customer?size=8',
+                success: function (data) {
+                    if (data.content.length > 0) {
+                        var html = ''
+                        data.content.forEach(item => {
+                            html+=`<div class="col-md-3 rounded border border-primary customer-item" data-customer-id="${item.id}">
+                                        <p class=".customer-name" >${item.name}</p>
+                                        <p class="customer-phone">${item.phoneNumber}</p>
+                                    </div>`
+                        })
+                        $('.customer-list').html(html)
+                        $('.customer-item').on('click', function () {
+                            $('.customer-item').removeClass('active')
+                            $(this).addClass('active')
+                        })
+                        $('.add-customer-btn').on('click', function () {
+                            $('.add-customer-form').show()
+                        })
+                    }
+                }
+            })
+
+        })
+        posProducts.forEach(item => {
+            item.addEventListener('click', (e) => {
+                addToSelectProduct(e)
+            })
+        })
+
+        var allPrice = document.getElementById("all-price")
+        var lastPrice = document.getElementById("last-price")
+        var productDiscount = document.getElementById("product-discount")
+        var voucherDiscount = document.getElementById("voucher-discount")
+        var customerPay = document.getElementById("customerPayInput")
+        var changeMoney = document.getElementById("change")
+        customerPay.oninput = function () {
+            let value = customerPay.value.replace(/\D/g, ''); // Remove non-digit characters
+            customerPay.value = value
+            var customerPayValue = customerPay.value
+            var lastPriceValue = parseFloat(lastPrice.textContent.replace(/[^0-9]/g, ''))
+
+            changeMoney.innerHTML = formatNumber((customerPayValue - lastPriceValue).toString())
+
+        }
+
+        function addToSelectProduct(e) {
+
+            var parentElement = e.currentTarget
+            var imgSrc = parentElement.querySelector('img').getAttribute('src');
+            var detailId = parentElement.querySelector(".detail-id").value
+
+            var productName = parentElement.querySelector('.product-name').textContent;
+
+            var price = parentElement.querySelector('.product-price').textContent;
+            var quantity = parentElement.querySelector('.product-quantity').getAttribute("data-select-quantity");
+            var canAdd = true
+            document.querySelectorAll('.product-select-body.active .product-select-item').forEach(item => {
+                if (item.querySelector('.product-select-name').textContent == productName) {
+                    canAdd = false
+                    return
+                }
+            })
+
+            if(quantity == 0) {
+                canAdd = false;
+                swal("Lỗi", "Số lượng sản phẩm này còn 0")
+            }
+
+            if(!canAdd) {
+                return
+            }
+            // Create a new row element
+            const newRow = document.createElement('div');
+            newRow.classList.add('row', 'border', 'border-primary', 'rounded', 'm-3', 'd-flex', 'justify-content-center', 'align-items-center', 'product-select-item');
+            newRow.setAttribute("data-product-detail", detailId)
+            // Create and append columns to the row
+            function createColumn(content, classNames = []) {
+                const col = document.createElement('div');
+                col.classList.add( 'text-center', ...classNames);
+                col.innerHTML = content;
+                return col;
+            }
+
+            newRow.appendChild(createColumn(`<h4>${document.querySelectorAll('.product-select-body.active .product-select-item').length + 1}</h4>`, ['col-1']));
+            newRow.appendChild(createColumn(`<img src="${imgSrc}" alt="..." class="rounded" width="40" height="40">`, ['col-1']));
+            newRow.appendChild(createColumn('<h6 class="product-select-name">' + productName + '</h6', ['col-3']));
+            newRow.appendChild(createColumn('<div class="quantity-container"><input min="1" max="50" class="m-2 quantity" style="width: 55px;" type="number" value="1"></div>', ['col-2']));
+            newRow.appendChild(createColumn('<h5 class="price">' + price + '</h5', ['col-2']));
+            newRow.appendChild(createColumn('<h5 class="total-price">' +  price + '</h5', ['col-2']));
+
+            // Create the delete button and append it to the last column
+            const deleteButtonContainer = document.createElement('div')
+            deleteButtonContainer.classList.add('col-1', 'text-center')
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.classList.add('btn', 'btn-danger', 'm-1');
+            deleteButton.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>';
+            deleteButtonContainer.appendChild(deleteButton)
+            newRow.appendChild(deleteButtonContainer);
+
+            document.querySelector('.product-select-body.active').appendChild(newRow)
+            deleteButton.onclick = function () {
+                // productSelects.splice(productSelects.findIndex(item => item.productName == newRow.querySelector('.product-select-name').textContent), 1)
+                document.querySelector('.product-select-body.active').removeChild(newRow)
+                const productRows = document.querySelectorAll('.product-select-body.active .product-select-item');
+                productRows.forEach((row, index) => {
+                    var stt = index + 1
+                    row.querySelector('h4').textContent = stt.toString();
+                });
+                calculateAllPrice()
+                calculateLastPrice()
+            }
+            newRow.dataset.price = price;
+            // Append the new row to the parent container (replace 'parentContainer' with the actual container ID or reference)
+
+            calculateAllPrice()
+            calculateLastPrice()
+            document.querySelectorAll('.product-select-item').forEach((item, index) => {
+                var inputQuantity = item.querySelector('.row input[type="number"]');
+                const totalPriceElement = item.querySelector('.total-price');
+                inputQuantity.addEventListener('input', (e) => {
+                    if(parseInt(inputQuantity.value) > parseInt(quantity)) {
+                        swal('Lỗi', "Vui lòng nhập số lượng nhỏ hơn " + quantity, "error")
+                        inputQuantity.value = quantity;
+                    }
+                    var price = item.querySelector('.price').textContent
+                    var totalPrice = inputQuantity.value * parseFloat(price.replace(/[^0-9]/g, ''))
+                    totalPriceElement.innerHTML = formatNumber(totalPrice.toString()) + '&nbsp;₫'
+                    calculateAllPrice()
+                    calculateLastPrice()
+                })
+            })
+
+            saveTabData()
+        }
+
+        function calculateAllPrice() {
+            var totalPrice = 0;
+            document.querySelectorAll('.product-select-body.active .product-select-item').forEach(item => {
+                totalPrice += parseFloat(item.querySelector('.total-price').textContent.replace(/[^0-9]/g, ''))
+            })
+            allPrice.innerText = formatNumber(totalPrice)
+        }
+
+        function calculateLastPrice() {
+            var lastPriceValue = parseFloat(allPrice.textContent.replace(/[^0-9]/g, '')) - parseFloat(productDiscount.textContent.replace(/[^0-9]/g, '')) - parseFloat(voucherDiscount.textContent.replace(/[^0-9]/g, ''))
+            if (lastPriceValue > 0) {
+                lastPrice.innerText = formatNumber(lastPriceValue.toString())
+            }
+            else {
+                lastPrice.innerText = '0'
+            }
+        }
+
+        function formatNumber(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+
+        //    =============== HANDLE TAB ================
+        //    Handle tab 1
+        document.querySelector('.tab').addEventListener('click', function () {
+            const tabList = document.querySelector(".tab-list")
+            const tabs = tabList.children
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+                document.querySelector('.product-select-content').children[i].classList.remove("active");
+            }
+            document.querySelector('.product-select-body').classList.add('active')
+            this.classList.add("active");
+            calculateAllPrice()
+            calculateLastPrice()
+        })
+
+        //Handle Click add Tab
+        addTabBtn.addEventListener("click", function () {
+            const newTab = document.createElement("div");
+            newTab.classList.add("tab");
+            newTab.textContent = "Đơn " + (tabList.childElementCount + 1);
+            // Add a close button to the new tab
+            const closeTabBtn = document.createElement("span");
+            closeTabBtn.classList.add("close-tab-btn");
+            closeTabBtn.innerHTML = " <i class=\"fa fa-times-circle-o\" aria-hidden=\"true\"></i>";
+            closeTabBtn.addEventListener("click", function (event) {
+                event.stopPropagation(); // Prevent the tab from closing when clicking the close button
+                closeTab(newTab);
+            });
+
+            newTab.appendChild(closeTabBtn);
+            tabList.appendChild(newTab);
+            var productSelectBody = document.createElement('div')
+            productSelectBody.classList.add('product-select-body')
+            tabContent.appendChild(productSelectBody)
+
+            newTab.addEventListener("click", function () {
+                const tabs = tabList.children;
+                for (let i = 0; i < tabs.length; i++) {
+                    tabs[i].classList.remove("active");
+                    tabContent.children[i].classList.remove("active");
+                }
+                productSelectBody.classList.add('active')
+                newTab.classList.add("active");
+                calculateAllPrice()
+                calculateLastPrice()
+            });
+            saveTabData()
+
+        });
+
+        function resetPayArea() {
+            allPrice.innerText = '0'
+            lastPrice.innerText = '0'
+        }
+
+        function closeTab(tab) {
+            const tabIndex = Array.from(tabList.children).indexOf(tab);
+            if (tabIndex !== -1) {
+                tabList.removeChild(tab);
+                tabContent.removeChild(tabContent.children[tabIndex])
+                // Activate another tab if the closed tab was active
+                if (tab.classList.contains("active") && tabList.children.length > 0) {
+                    tabList.children[0].click();
+                }
+            }
+            saveTabData()
+        }
+
+        function saveTabData() {
+            const tabsData = [];
+            const content = []
+
+            const tabs = tabList.querySelectorAll(".tab");
+            for (let i = 0; i < tabs.length; i++) {
+                var dataProducts = tabContent.children[i].querySelectorAll('.product-select-item')
+                dataProducts.forEach(item => content.push({
+                    img: item.querySelector('img').getAttribute('src'),
+                    name: item.querySelector(".product-select-name").textContent,
+                    quantity: item.querySelector('.quantity').value,
+                    price: item.querySelector('.price').textContent,
+                }))
+                tabsData.push({
+                    title: tabs[i].textContent,
+                    content: content
+                });
+            }
+
+            localStorage.setItem("tabsData", JSON.stringify(tabsData));
+        }
+
+
+
+
+
+        //==========    ==================================== XỬ LÝ THANH TOÁN =============================================
+
+        async function generateAndPrintPDF() {
+            const customerId = $(".customer-item.active").attr("data-customer-id")
+            if (customerId == null || customerId == undefined || customerId == "") {
+                swal("Lỗi", "Vui lòng chọn khách hàng", "error")
+                return
+            }
+
+            var orderDetails = []
+            $(".product-select-body.active .product-select-item").each(function () {
+                orderDetails.push({
+                    productDetailId: $(this).attr("data-product-detail"),
+                    quantity: $(this).find(".quantity").val()
+                })
+            })
+
+            if(orderDetails.length <= 0) {
+                swal("Error", "Sản phẩm chọn trống", "error")
+                return;
+            }
+
+            var dataSend = {
+                customer: {
+                    id: customerId
+                },
+                paymentMethodId: $('input[name="paymentMethod"]:checked').val(),
+                billingAddress: "",
+                promotionPrice: 0,
+                orderDetailDtos: orderDetails
+            }
+
+            $('#loading-overlay').show();
+            await $.ajax({
+                type: 'POST',
+
+                url: '/api/orderAdmin',
+                data: JSON.stringify(dataSend),
+                contentType: "application/json; charset=utf-8",
+                success: async function (data) {
+                    $('#loading-overlay').hide();
+                    $(".product-select-body.active").html('')
+                    resetPayArea()
+                    Toastify({
+                        text: "Thanh toán thành công",
+                        className: "info",
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        }
+                    }).showToast();
+
+                    var generateUrl = `/admin/generate-pdf/${data.billId}`;
+                    // Fetch the HTML content from the controller
+                    await fetch(generateUrl)
+                        .then(response => response.text())
+                        .then(htmlContent => {
+
+                            var printWindow = window.open('', '', 'width=800,height=1000');
+                            printWindow.document.open();
+                            ;
+                            printWindow.document.write(htmlContent);
+                            printWindow.document.close();
+                            printWindow.print();
+
+                        })
+                        .catch(error => {
+                            $('#loading-overlay').hide();
+                            swal("Lỗi", "Lỗi export pdf phía server")
+                        });
+                },
+                error: function (xhr, status, error) {
+                    $('#loading-overlay').hide();
+                    swal("Error", xhr.responseJSON.message, "error")
+                }
+            })
+
+
+
+        }
+
+        // Call the function when a button is clicke
+
+
+    </script>
+</div>
+<script src="vendors/jquery/dist/jquery.min.js"></script>
+<script src="vendors/popper.js/dist/umd/popper.min.js"></script>
+<script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

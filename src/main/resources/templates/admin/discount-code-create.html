@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content" class="page-wrapper bg-gra-02 p-t-130 p-b-100 font-poppins">
+    <div class="wrapper wrapper--w680">
+        <div class="card card-4">
+            <div class="card-body">
+                <h2 class="title">Thông tin mã giảm giá</h2>
+                <div class="alert alert-danger" th:if="${message != null}" th:text="${message}"></div>
+                <form method="POST" id="discount-code-form" th:action="${action}" th:object="${DiscountCode}" >
+                    <input type="hidden" th:field="*{id}">
+                    <div class="row mt-3">
+                        <div class="col-sm-4">
+                           <div class="form-group">
+                               <label class="control-label">
+                                   Mã giảm giá
+                               </label>
+                               <span class="red_require"> *</span>
+                               <input type="text" class="form-input" th:field="*{code}" placeholder="VD: BIRTHDAY2023">
+                               <span class="error"></span>
+                           </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Ngày áp dụng
+                                </label>
+                                <span class="red_require"> *</span>
+                                <input type="date" class="form-input" th:field="*{startDate}">
+                                <span class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Ngày kết thúc
+                                </label>
+                                <span class="red_require"> *</span>
+                                <input type="date" class="form-input" th:field="*{endDate}">
+                                <span class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+<!--                    <div class="row mt-3">-->
+<!--                        <div class="col-sm-12">-->
+<!--                            <label class="control-label">-->
+<!--                                Tên mã giảm giá-->
+<!--                            </label>-->
+<!--                            <span class="red_require"> *</span>-->
+<!--                            <input type="text" class="form-input" th:field="*{detail}" placeholder="VD: Giảm giá 20.000..... r" required >-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="row mt-3">
+                        <div class="col-sm-4">
+                            <label class="control-label">
+                                Phương thức giảm
+                            </label>
+                            <div>
+                                <input type="radio" class="custom-radio" th:field="*{type}" th:value="1" th:checked="${DiscountCode.type == 1}">
+                                <label th:for="type1">Giảm theo phần trăm</label>
+                                <input type="radio" class="custom-radio" th:field="*{type}" th:value="2" th:checked="${DiscountCode.type == 2}">
+                                <label th:for="type2">Giảm theo tiền</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-6" id="discount-by-money">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Số tiền giảm (đ)
+                                </label>
+                                <span class="red_require"> *</span>
+                                <input type="text" class="form-input" th:field="*{discountAmount}" placeholder="VD: 10000">
+                                <span class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3"  id="discount-by-percent">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Phần trăm giảm (%)
+                                </label>
+                                <span class="red_require"> *</span>
+                                <input type="text" class="form-input" th:field="*{percentage}" placeholder="VD: 2">
+                                <span class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3"  id="max-amount-by-percent">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Số tiền giảm tối đa (đ)
+                                </label>
+                                <span class="red_require"> *</span>
+                                <input type="text" class="form-input" th:field="*{maximumAmount}" placeholder="VD: 20000">
+                                <span class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Số tiền áp dụng cho đơn tối thiểu từ (đ)
+                                </label>
+                                <span class="red_require"> *</span>
+                                <input type="text" class="form-input" th:value="${#numbers.formatDecimal(DiscountCode.minimumAmountInCart, 0, 0)}" name="minimumAmountInCart" id="minimumAmountInCart" placeholder="VD: 100000 nếu áp dụng cho đơn tối từ 100.000VND">
+                                <span class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-4">
+                           <div class="form-group">
+                               <label class="control-label">
+                                   Số lượng tối đa
+                               </label>
+                               <span class="red_require"> *</span>
+                               <input type="text" class="form-input" th:field="*{maximumUsage}"  placeholder="VD: 123">
+                               <span class="error"></span>
+                           </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <a th:href="@{/admin-only/discount-code}" class="btn btn-outline-danger rounded mr-1">
+                            Hủy
+                            <!--                            <span *ngIf="showLoadding" class="spinner-border spinner-border-sm" role="status">-->
+                            <!--                            </span>-->
+                        </a>
+                        <button  class="btn-submit cursor-pointer">
+                            Lưu
+<!--                            <span *ngIf="showLoadding" class="spinner-border spinner-border-sm" role="status">-->
+<!--                            </span>-->
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" th:inline="javascript"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            var type = /*[[${DiscountCode.type}]]*/ '';
+            $("#discount-by-money").hide()
+            $("#discountAmount").prop('disabled', true)
+            if(type == 2) {
+                $("#discount-by-percent").hide()
+                $("#max-amount-by-percent").hide()
+                $("#discount-by-money").show()
+                $("#discountAmount").prop('disabled', false)
+                $('#percentage').prop('disabled', true)
+                $('#maximumAmount').prop('disabled', true)
+            }
+
+            $("#type1").on("click", function () {
+                $("#discount-by-money").hide()
+                $("#discount-by-percent").show()
+                $("#max-amount-by-percent").show()
+                $("#discountAmount").prop('disabled', true)
+                $('#percentage').prop('disabled', false)
+                $('#maximumAmount').prop('disabled', false)
+            })
+
+            $("#type2").on("click", function () {
+                $("#discount-by-money").show()
+                $("#discount-by-percent").hide()
+                $("#max-amount-by-percent").hide()
+                $("#discountAmount").prop('disabled', false)
+                $('#percentage').prop('disabled', true)
+                $('#maximumAmount').prop('disabled', true)
+
+            })
+
+            Validator({
+                form: '#discount-code-form',
+                formGroupSelector: '.form-group',
+                errorSelector: '.error',
+                rules: [
+                    Validator.isRequired('#code', 'Vui lòng nhập mã giảm giá'),
+                    Validator.isRequired('#startDate', 'Vui lòng nhập ngày bắt đầu'),
+                    Validator.isRequired('#endDate', 'Vui lòng nhập ngày kết thúc'),
+                    Validator.isRequired('#maximumUsage', "Vui lòng nhập số lượng tối đa"),
+                    Validator.isRequired('#discountAmount', "Vui lòng nhập số tiền giảm giá"),
+                    Validator.isRequired('#minimumAmountInCart', "Vui lòng nhập số tiền áp dụng cho đơn tối thiểu"),
+                    Validator.isRequired('#percentage', 'Vui lòng nhập phần trăm giảm'),
+                    Validator.isRequired('#maximumAmount', 'Vui lòng nhập số tiền giảm tối đa mỗi đơn'),
+                    Validator.maxLength('#code', 50),
+                    Validator.isValidStartDateEndDate('#startDate', () =>  {
+                        return document.querySelector('#discount-code-form #endDate').value;
+                    }, 'Ngày áp dụng phải nhỏ hơn ngày kết thúc')
+                ]
+            });
+
+            // $('#discount-code-form').on('submit', function () {
+            //     if($('#startDate').val() >= $('#endDate').val()) {
+            //         Swal.fire({
+            //             text:'Ngày áp dụng phải nhỏ hơn ngày kết thúc',
+            //             icon: 'error'
+            //         })
+            //         return false;
+            //     }
+            //     return true
+            // })
+
+
+            $("#percentage").on('input', function () {
+                if(parseInt($(this).val()) > 98) {
+                    $(this).val(98);
+                    Toastify({
+                        text: "Giảm giá tối đa 98%",
+                        className: "error",
+                        style: {
+                            color: "white",
+                            background: "red",
+                        }
+                    }).showToast();
+                }
+            })
+
+            $("#discountAmount").on('keypress', function (e) {
+                onlyAllowNumberInput(e)
+            });
+
+            $("#percentage").on('keypress', function (e) {
+                onlyAllowNumberInput(e)
+            });
+
+            $('#maximumAmount').on('keypress', function (e) {
+                onlyAllowNumberInput(e)
+            })
+
+            $("#minimumAmountInCart").on('keypress', function (e) {
+                onlyAllowNumberInput(e)
+            });
+
+            $("#maximumUsage").on('keypress', function (e) {
+                onlyAllowNumberInput(e)
+            });
+
+            function onlyAllowNumberInput(e) {
+                const key = e.key;
+                if (!/[\d\b]/.test(key)) {
+                    e.preventDefault();
+                }
+            }
+
+            function removeAnyNonDigit(value) {
+                return value.replace(/\D/g, '');
+            }
+
+
+        })
+    </script>
+</div>
+</body>
+</html>

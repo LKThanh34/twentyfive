@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="custom-modal" id="update-account-modal">
+            <div class="modal-content rounded">
+                <span class="close" >&times;</span>
+                <div class="modal-header mb-1">
+                    <h5>Đổi thông tin tài khoản</h5>
+                </div>
+                <form id="customer-form" method="post" th:action="@{/account/change-role}">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <span class="red_require"> </span>
+                        <input class="form-control" type="text" name="email" id="email" readonly>
+                        <span class="error"></span>
+                        <!-- Add more fields as needed -->
+                    </div>
+
+<!--                    <div class="form-group">-->
+<!--                        <label for="name">Họ tên: </label>-->
+<!--                        <span class="red_require"></span>-->
+<!--                        <input class="form-control" type="text" name="name" id="name" placeholder="Nhập họ tên">-->
+<!--                        <span class="error"></span>-->
+<!--                        &lt;!&ndash; Add more fields as needed &ndash;&gt;-->
+<!--                    </div>-->
+                    <div class="form-group">
+                        <label for="role">Role: </label>
+                        <span class="red_require"></span>
+                        <select class="form-select" type="text" name="role" id="role">
+                            <option value="1">Admin</option>
+                            <option value="2">Nhân viên</option>
+                            <option value="3">Người dùng</option>
+                        </select>
+                        <span class="error"></span>
+                        <!-- Add more fields as needed -->
+                    </div>
+                    <button class="btn btn-primary mt-2 w-100" id="save-category-btn">Lưu</button>
+                </form>
+
+            </div>
+        </div>
+
+        <h4>Quản lý tài khoản</h4>
+        <div class="alert alert-success" role="alert" th:if="${message}">
+            <span th:text="${message}"></span>
+        </div>
+        <div class="mt-3">
+            <table id="myTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Mã tài khoản</th>
+                    <th>Email</th>
+                    <th>Họ tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Quyền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="account : ${accountList}">
+                    <td>
+                        <span th:text="${account.code}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${account.email}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${account.customer.name}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${account.customer.phoneNumber}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${account.role.name}"></span>
+                    </td>
+                    <td>
+                        <span th:unless="${account.isNonLocked}" class="badge badge-danger">Đã khóa</span>
+                        <span th:if="${account.isNonLocked}" class="badge badge-success">Hoạt động</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <form th:action="@{'/account/block/' + ${account.id}}" method="post">
+                                <button th:if="${account.isNonLocked}" type="button" th:data-close-id="${account.id}" class="block-account-btn btn bg-transparent text-danger rounded">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6 22q-.825 0-1.412-.587T4 20V10q0-.825.588-1.412T6 8h1V6q0-2.075 1.463-3.537T12 1q2.075 0 3.538 1.463T17 6v2h1q.825 0 1.413.588T20 10v10q0 .825-.587 1.413T18 22H6Zm0-2h12V10H6v10Zm6-3q.825 0 1.413-.587T14 15q0-.825-.587-1.412T12 13q-.825 0-1.412.588T10 15q0 .825.588 1.413T12 17ZM9 8h6V6q0-1.25-.875-2.125T12 3q-1.25 0-2.125.875T9 6v2ZM6 20V10v10Z"/></svg>
+                                </button>
+                            </form>
+                            <form th:action="@{'/account/open/' + ${account.id}}" method="post">
+                                <button th:unless="${account.isNonLocked}" type="button" th:data-close-id="${account.id}" class="open-account-btn btn bg-transparent text-success rounded">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="green" d="M6 8h9V6q0-1.25-.875-2.125T12 3q-1.25 0-2.125.875T9 6H7q0-2.075 1.463-3.537T12 1q2.075 0 3.538 1.463T17 6v2h1q.825 0 1.413.588T20 10v10q0 .825-.587 1.413T18 22H6q-.825 0-1.412-.587T4 20V10q0-.825.588-1.412T6 8Zm0 12h12V10H6v10Zm6-3q.825 0 1.413-.587T14 15q0-.825-.587-1.412T12 13q-.825 0-1.412.588T10 15q0 .825.588 1.413T12 17Zm-6 3V10v10Z"/></svg>
+                                </button>
+                            </form>
+                            <span class="text-primary rounded cursor-pointer change-role-btn" th:data-email="${account.email}" th:data-role="${account.role.id}">
+                            <i class="fas fa-users-cog"></i>
+                        </span>
+                        </div>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <script>
+            $(document).ready(function () {
+                new DataTable('#myTable', {
+                    order: [],
+                    language: {
+                        search: "Tìm kiếm:",
+                        "lengthMenu": "Hiển thị _MENU_ bản ghi 1 trang",
+                        "zeroRecords": "Không tìm thấy bản ghi nào",
+                        "info": "Hiển thị trang _PAGE_ trong _PAGES_",
+                        "paginate": {
+                            "first":      "<<",
+                            "last":       ">>",
+                            "next":       ">",
+                            "previous":   "<"
+                        },
+                    }
+                })
+                    .on('draw.dt', () => setEvent())
+
+                setEvent()
+
+                function setEvent() {
+                    $('.change-role-btn').on('click', function () {
+                        $('.custom-modal').show()
+                        var role = $(this).attr('data-role')
+                        var email =$(this).attr('data-email')
+                        $('#email').val(email)
+                        $('#role').val(role)
+                    })
+
+                    $('.close').on('click', function () {
+                        $('.custom-modal').hide()
+                    })
+
+                    $('.block-account-btn').on('click', function () {
+                        Swal.fire({
+                            title: 'Khóa tài khoản',
+                            text: 'Bạn chắc chắc muốn khóa tài khoản này?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            cancelButtonText: 'Hủy',
+                            confirmButtonText: 'Xác nhận',
+                            reverseButtons: true
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                $(this).closest('form').submit()
+                            }
+                        })
+                    })
+
+                    $('.open-account-btn').on('click', function () {
+                        Swal.fire({
+                            title: 'Khóa tài khoản',
+                            text: 'Bạn chắc chắc muốn mở khóa tài khoản này?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            cancelButtonText: 'Hủy',
+                            confirmButtonText: 'Xác nhận',
+                            reverseButtons: true
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                $(this).closest('form').submit()
+                            }
+                        })
+                    })
+                }
+            })
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{user/layout-user.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex flex-column w-100" style="background-color: rgb(249, 249, 249);  height: 100vh;">
+        <div class="container mt-4">
+            <div class="d-flex justify-content-center bg-white" style="box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;">
+                <div class="page-right">
+                    <h2 class="text-center font-weight-bold" style="font-size: 30px">KẾT QUẢ THANH TOÁN</h2>
+                    <div class="mt-5">
+                        <div class="text-center mb-4">
+                            <span class="text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 15 15"><path fill="green" fill-rule="evenodd" d="M0 7.5a7.5 7.5 0 1 1 15 0a7.5 7.5 0 0 1-15 0Zm7.072 3.21l4.318-5.398l-.78-.624l-3.682 4.601L4.32 7.116l-.64.768l3.392 2.827Z" clip-rule="evenodd"/></svg>
+
+                        </span><br>
+                            <span class="text-center font-weight-bold text-success" th:text="${status}">
+
+                        </span>
+                        </div>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>Mã giao dịch của bạn là:</th>
+                                <td class="text-success font-weight-bold" th:text="${result.txnRef}"></td>
+                            </tr>
+                            <!-- <tr>
+                              <th>Số hóa đơn:</th>
+                              <td>{{orderId}}</td>
+                            </tr> -->
+                            <tr>
+                                <th>Số tiền thanh toán:</th>
+                                <td class="font-weight-bold" th:text="${#numbers.formatDecimal(result.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                            </tr>
+
+                            <tr>
+                                <th>Ngân hàng: </th>
+                                <td th:text="${result.bankCode}"></td>
+                            </tr>
+                            <tr>
+                                <th>Ngày giao dịch: </th>
+                                <td th:text="${#temporals.format(#temporals.createDateTime(result.datePay, 'yyyyMMddHHmmss'), 'dd-MM-yyyy HH:mm:ss')}"></td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" th:inline="javascript"></script>
+    <script th:inline="javascript">
+        var paymentSuccess = /*[[${paymentSuccess}]]*/ '';
+        var orderId = /*[[${orderId}]]*/ '';
+
+       if(paymentSuccess) {
+            if(sessionStorage.getItem("orderTemp"))
+            var dataSend = JSON.parse(sessionStorage.getItem("orderTemp"))
+            dataSend.orderId=orderId
+            order()
+
+        }
+
+       async function order() {
+           await $.ajax({
+               type: 'POST',
+
+               url: '/api/orderUser',
+               data: JSON.stringify(dataSend),
+               contentType: "application/json; charset=utf-8",
+               success: function (data) {
+                   sessionStorage.removeItem("orderTemp")
+                   // swal("Đơn hàng", "Thành toán thành công", "success")
+               },
+               error: function (xhr, status, error) {
+
+                   swal("Error", xhr.responseJSON.message, "error")
+               }
+           })
+       }
+    </script>
+</div>
+
+</body>
+</html>

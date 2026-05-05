@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+    <div layout:fragment="content">
+        <h4 class="mt-2">Danh sách đổi trả</h4>
+        <div class="my-3">
+            <form th:action="@{/admin-only/bill-return}">
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label for="fromDate">Bắt đầu</label>
+                        <input type="date" class="form-control" id="fromDate" name="fromDate" placeholder="Từ">
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="toDate">Kết thúc</label>
+                        <input type="date" class="form-control" id="toDate" name="toDate" placeholder="Đến">
+                    </div>
+                    <div>
+                        <label for="returnStatus">Trạng thái</label>
+                        <select class="form-select" name="returnStatus" id="returnStatus">
+                            <option value="">Tất cả</option>
+                            <option value="0">Chờ xác nhận</option>
+                            <option value="1">Chờ lấy hàng</option>
+                            <option value="2">Chờ giao hàng</option>
+                            <option value="3">Hoàn thành</option>
+                            <option value="4">Đã hủy</option>
+                        </select>
+                    </div>
+                    <!--                <div class="form-group col-md-2">-->
+                    <!--                    <label >Khách hàng</label>-->
+                    <!--                    <input type="text" class="form-control" placeholder="Họ tên, SĐT Khách hàng">-->
+                    <!--                </div>-->
+                    <!--                <div class="form-group col-md-2">-->
+                    <!--                    <label >Sản phẩm đổi</label>-->
+                    <!--                    <input type="text" class="form-control" placeholder="Mã, tên sản phẩm đổi">-->
+                    <!--                </div>-->
+                </div>
+                <button type="submit" class="btn btn-primary m-1"><i class="fa fa-search"></i> Tìm kiếm</button>
+                <a class="btn btn-secondary" th:href="@{/admin-only/bill-return}">Hủy bỏ</a>
+            </form>
+        </div>
+        <div class="d-flex flex-row-reverse">
+            <a th:href="@{/admin-only/bill-return-create}" class="btn btn-success font-weight-bold">Đổi trả +</a>
+        </div>
+        <div class="mt-3">
+            <table id="myTable" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Mã đổi trả</th>
+                    <th>Thời gian</th>
+                    <th>Khách hàng</th>
+                    <th>Tiền trả khách</th>
+                    <th>Lý do</th>
+                    <th>Trạng thái</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="return : ${returnList}" class="return-item cursor-pointer" th:data-return-id="${return.id}">
+                    <td>
+                        <span th:text="${return.code}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${#temporals.format(return.returnDate, 'dd-MM-yyyy HH:mm')}"></span>
+                    </td>
+                    <td>
+                        <span th:if="${return.customer}" th:text="${return.customer.name}"></span>
+                        <span th:if="${return.customer == null}" class="font-italic text-muted">Khách lẻ</span>
+
+                    </td>
+                    <td>
+                        <span th:text="${#numbers.formatDecimal(return.returnMoney, 0, 'POINT', 0, 'COMMA')}"></span>
+                    </td>
+                    <td>
+                        <span th:if="${return.returnReason}" th:text="${return.returnReason}"></span>
+                        <span th:if="${return.returnReason == null || return.returnReason == ''}" class="font-italic text-muted">Không có</span>
+                    </td>
+                    <td>
+                        <span class="text-warning p-1 rounded border border-warning font-weight-bold"
+                             th:if="${return.returnStatus == 0}"><i class="fas fa-check-square"></i>&nbsp;Chờ xác nhận
+                        </span>
+                        <span class="text-secondary p-1 rounded border border-secondary font-weight-bold"
+
+                             th:if="${return.returnStatus == 1}"><i class="fas fa-check-square"></i> Chờ lấy hàng
+                        </span>
+                        <span class="text-primary p-1 rounded border border-primary font-weight-bold"
+                             th:if="${return.returnStatus == 2}"><i class="fas fa-check-square"></i>&nbsp;Chờ giao hàng
+                        </span>
+
+                        <span class="text-success p-1 rounded border border-success font-weight-bold"
+                              th:if="${return.returnStatus == 3}"><i class="fas fa-check-square"></i>&nbsp;Hoàn
+                            thành
+                        </span>
+
+                        <span th:if="${return.returnStatus == 4}" class="text-danger p-1 rounded border border-danger font-weight-bold">
+                            <i class="fa fa-times-circle"></i>&nbsp;Hủy
+                        </span>
+                    </td>
+<!--                    <td>-->
+<!--                        <div class="d-flex align-items-center">-->
+<!--                            <form th:action="@{'/admin/update-bill-return-status/'}" method="post">-->
+<!--                                <input type="hidden" name="id" th:value="${return.id}">-->
+<!--                                <input type="hidden" name="returnStatus" value="4">-->
+<!--                                <span type="button" th:if="${return.returnStatus == 0 || return.returnStatus == 1 }" class="cancel-btn bg-transparent mr-2" data-toggle="tooltip" data-placement="top" title="Hủy đơn">-->
+<!--                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="red" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07zm1.41-1.41A8 8 0 1 0 15.66 4.34A8 8 0 0 0 4.34 15.66zm9.9-8.49L11.41 10l2.83 2.83l-1.41 1.41L10 11.41l-2.83 2.83l-1.41-1.41L8.59 10L5.76 7.17l1.41-1.41L10 8.59l2.83-2.83l1.41 1.41z"/></svg>-->
+<!--                            </span>-->
+<!--                            </form>-->
+<!--                            <form th:action="@{/admin/update-bill-return-status/}" method="post" class="changeStatusForm">-->
+<!--                                <input type="hidden" name="id" th:value="${return.id}">-->
+<!--                                <input type="hidden" name="returnStatus" th:value="${return.returnStatus + 1}">-->
+<!--                                <span type="button" th:if="${return.returnStatus != 3 && return.returnStatus != 4}"-->
+<!--                                      class=" hover-green btn-update-status" data&#45;&#45;toggle="tooltip" data-placement="top" th:data-status="${return.returnStatus}"-->
+<!--                                      title="Chuyển sang trạng thái tiếp">-->
+<!--                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0m12 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M6 12v-2a6 6 0 1 1 12 0v2"/><path d="m15 9l3 3l3-3"/></g></svg>-->
+<!--                                </span>-->
+<!--                            </form>-->
+<!--                        </div>-->
+
+<!--                    </td>-->
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+<!--        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>-->
+<!--        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>-->
+<!--        <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>-->
+<!--        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
+
+        <script th:inline="javascript">
+            // $('#myTable').DataTable();
+            new DataTable('#myTable', {
+                order: [],
+                language: {
+                    search: "Tìm kiếm:",
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi 1 trang",
+                    "zeroRecords": "Không tìm thấy bản ghi nào",
+                    "info": "Hiển thị trang _PAGE_ trong _PAGES_",
+                    "infoEmpty": "Không có bản ghi nào",
+                    "paginate": {
+                        "first":      "<<",
+                        "last":       ">>",
+                        "next":       ">",
+                        "previous":   "<"
+                    },
+                }
+            });
+            $('.return-item').on('dblclick', function () {
+                const billReturnId =  $(this).closest('.return-item').attr('data-return-id')
+                window.location.href = "/admin-only/bill-return-detail/" + billReturnId;
+            })
+
+            $('.cancel-btn').on('click', function (e) {
+                e.stopPropagation()
+                Swal.fire({
+                    title: "Xác nhận?",
+                    text: `Bạn chắc chắn muốn hủy đơn này!`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: 'Hủy',
+                    confirmButtonText: 'Xác nhận',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $(this).closest('form').submit();
+                    }
+                });
+            })
+
+            $('.btn-update-status').on('click', function (e) {
+                e.stopPropagation()
+                var currentStatus = $(this).attr('data-status')
+                var nextStatus;
+                var statusMessage;
+                switch (currentStatus) {
+                    case "0":
+                        nextStatus = "CHO_GIAO_HANG";
+                        statusMessage = "Chờ lấy hàng";
+                        break;
+                    case "1":
+                        nextStatus = "DANG_GIAO_HANG";
+                        statusMessage = "Chờ giao hàng";
+                        break;
+                    case "2":
+                        nextStatus = "HOAN_THANH";
+                        statusMessage = "Hoàn thành";
+                        break;
+                }
+                Swal.fire({
+                    title: "Xác nhận?",
+                    text: `Xác nhận chuyển sang ${statusMessage}`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: 'Hủy',
+                    confirmButtonText: 'Xác nhận',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $(this).closest('form').submit();
+                    }
+                });
+            })
+        </script>
+    </div>
+</body>
+</html>

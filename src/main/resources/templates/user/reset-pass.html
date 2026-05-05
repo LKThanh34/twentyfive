@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{user/layout-user.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h2 class="ltext-105 txt-center">
+            Nhập mã xác thực được gửi đến email của bạn
+        </h2>
+
+        <section class="bg0 p-b-60">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-4">
+                        <div th:if="${errorMessage}" class="alert alert-danger">
+                            <p th:text="${errorMessage}"></p>
+                        </div>
+                        <form class="mt-5 px-4 pt-4 pb-6 shadow-sm border" th:action="@{/reset-password}" method="post" id="login-form">
+
+                            <div class="form-group">
+                                <label>Mã xác thực</label>
+                                <input type="text" class="form-control" id="verificationCode" name="verificationCode" placeholder="Mã xác thực">
+                                <span class="error text-danger text-sm"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Mật khẩu mới</label>
+                                <input type="text" class="form-control" id="newPassword" name="newPassword" placeholder="Mật khẩu mới">
+                                <span class="error text-danger text-sm"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Đặt lại mật khẩu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

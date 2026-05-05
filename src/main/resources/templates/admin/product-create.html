@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout.html}">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="custom-modal" id="add-brand-modal">
+        <div class="modal-content rounded">
+            <span class="close" id="closeModal">&times;</span>
+                <div class="modal-header mb-1">
+                    <h5>Thêm nhãn hàng mới</h5>
+                </div>
+                <form id="brand-form">
+                    <div class="form-group">
+                        <label for="brandCode">Mã nhãn hàng:</label>
+                        <span class="red_require"> *</span>
+                        <input class="form-control" type="text" name="brandCode" id="brandCode" placeholder="Nhập mã nhãn hàng">
+                        <span class="error"></span>
+                        <!-- Add more fields as needed -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="brandName">Tên nhãn hàng:</label>
+                        <span class="red_require"> *</span>
+                        <input class="form-control" type="text" name="brandName" id="brandName" placeholder="Nhập tên nhãn hàng">
+                        <span class="error"></span>
+                        <!-- Add more fields as needed -->
+                    </div>
+                    <button class="btn btn-primary mt-2 w-100" id="save-brand-btn">Lưu</button>
+                </form>
+
+        </div>
+    </div>
+
+<!--    MODAL THỂ LOẠI-->
+    <div class="custom-modal" id="add-category-modal">
+        <div class="modal-content rounded">
+            <span class="close" >&times;</span>
+            <div class="modal-header mb-1">
+                <h5>Thêm loại hàng mới</h5>
+            </div>
+            <form id="category-form">
+                <div class="form-group">
+                    <label for="categoryCode">Mã loại:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="categoryCode" id="categoryCode" placeholder="Nhập mã loại">
+                    <span class="error"></span>
+                    <!-- Add more fields as needed -->
+                </div>
+
+                <div class="form-group">
+                    <label for="categoryName">Tên loại:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="categoryName" id="categoryName" placeholder="Nhập tên loại">
+                    <span class="error"></span>
+                    <!-- Add more fields as needed -->
+                </div>
+                <button class="btn btn-primary mt-2 w-100" id="save-category-btn">Lưu</button>
+            </form>
+
+        </div>
+    </div>
+<!--    End modal thể loại-->
+
+    <!--    MODAL Chất liệu-->
+    <div class="custom-modal" id="add-material-modal">
+        <div class="modal-content rounded">
+            <span class="close" >&times;</span>
+            <div class="modal-header mb-1">
+                <h5>Thêm chất liệu mới</h5>
+            </div>
+            <form id="material-form">
+                <div class="form-group">
+                    <label for="materialCode">Mã chất liệu:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="materialCode" id="materialCode" placeholder="Nhập mã chất liệu">
+                    <span class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="materialName">Tên chất liệu:</label>
+                    <span class="red_require"> *</span>
+                    <input class="form-control" type="text" name="materialName" id="materialName" placeholder="Nhập tên chất liệu">
+                    <span class="error"></span>
+                </div>
+                <button class="btn btn-primary mt-2 w-100" id="save-material-btn">Lưu</button>
+            </form>
+
+        </div>
+    </div>
+    <!--    End modal chất liệu-->
+
+    <h4>Thông tin sản phẩm</h4>
+    <form th:object="${product}" th:method="post" th:action="${action}" id="formProduct1">
+        <div class="my-3">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Mã sản phẩm</label>
+                    <input type="text" class="form-control" th:field="*{code}" placeholder="---Mã tự động nếu để trống---">
+                    <span class="error"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Tên sản phẩm</label>
+                    <span class="red_require"> *</span>
+                    <input type="text" class="form-control" th:field="*{name}">
+                    <span class="error"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <div class="select-container">
+                        <label>Nhãn hàng</label>
+                        <span class="red_require"> *</span>
+                        <select class="form-select" th:field="*{brand}">
+                            <option th:value="${brand.id}" th:each="brand: ${listBrand}"
+                                    th:text="${brand.name}"></option>
+                        </select>
+                        <span id="add-brand" class="plus-icon"><i class="fas fa-plus"></i></span>
+
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <div class="select-container">
+                        <label>Thể loại</label>
+                        <span class="red_require"> *</span>
+                        <select class="form-select" th:field="*{category}">
+                            <option th:value="${category.id}" th:each="category: ${listCategory}"
+                                    th:text="${category.name}"></option>
+                        </select>
+                        <span id="add-category" class="plus-icon"><i class="fas fa-plus"></i></span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <div class="select-container">
+                        <label>Chất liệu</label>
+                        <span class="red_require"> *</span>
+                        <select class="form-select" th:field="*{material}">
+                            <option th:value="${material.id}" th:each="material: ${listMaterial}"
+                                    th:text="${material.name}"></option>
+                        </select>
+                        <span id="add-material" class="plus-icon"><i class="fas fa-plus"></i></span>
+                    </div>
+
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Trạng thái</label>
+                    <span class="red_require"> *</span>
+                    <select class="form-select" th:field="*{status}">
+                        <option th:value="1" th:text="'Còn bán'" selected></option>
+                        <option th:value="2" th:text="'Ngừng bán'" ></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Giới tính</label>
+                    <span class="red_require"> *</span>
+                    <select class="form-select" th:field="*{gender}">
+                        <option th:value="1" th:text="'Nam'" selected></option>
+                        <option th:value="2" th:text="'Nữ'" ></option>
+                        <option th:value="3" th:text="'Unisex'" ></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Mô tả</label>
+                    <textarea class="form-control" th:field="*{describe}" rows="3"></textarea>
+                    <span class="error"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary m-1"><i class="fa ti-save" id="next-btn"></i> Tiếp theo</button>
+            <a href="/admin/product-all" class="btn btn-dark m-1"><i class="fa fa-mail-reply (alias)"></i>
+                <span>Hủy</span></a>
+        </div>
+
+    </form>
+    <div th:if="${duplicateCode!=null}" th:text="${duplicateCode}" class="alert alert-danger ml-2 py-2 px-2"></div>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $('#add-brand').on('click', function () {
+                $('#add-brand-modal').show()
+            })
+
+            $('#add-category').on('click', function () {
+                $('#add-category-modal').show()
+            })
+
+            $('#add-material').on('click', function () {
+                $('#add-material-modal').show()
+            })
+
+
+            $('.close').on('click', function () {
+                $(this).closest('.custom-modal').hide()
+            })
+
+            // VALIDATE BRAND
+            Validator({
+                form: '#brand-form',
+                formGroupSelector: '.form-group',
+                errorSelector: '.error',
+                rules: [
+                    Validator.isRequired('#brandName', 'Vui lòng nhập tên nhãn hàng'),
+                    Validator.isRequired('#brandCode', 'Vui lòng nhập mã nhãn hàng'),
+                    Validator.maxLength('#brandName', 30),
+                    Validator.maxLength('#brandCode', 20)
+                ],
+                onSubmit: async function (data) {
+                    var dataSend = {
+                        code: data.brandCode,
+                        name: data.brandName
+                    }
+                    await $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(dataSend),
+                        url: '/api/brand',
+
+                        success: function (data) {
+                            $("#add-brand-modal").hide()
+                            $('#brand').append(`<option value="${data.id}">${data.name}</option>`)
+                            $('#brand').val(`${data.id}`)
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Lỗi",
+                                text: xhr.responseJSON.message,
+                                icon: "error"
+                            });
+                        }
+                    })
+                }
+            });
+            //END VALIDATE BRAND
+
+            //VALIDATE CATEGORY
+            Validator({
+                form: '#category-form',
+                formGroupSelector: '.form-group',
+                errorSelector: '.error',
+                rules: [
+                    Validator.isRequired('#categoryCode', 'Vui lòng nhập mã loại hàng'),
+                    Validator.isRequired('#categoryName', 'Vui lòng nhập tên loại hàng'),
+                    Validator.maxLength('#categoryName', 30),
+                    Validator.maxLength('#categoryCode', 20)
+                ],
+                onSubmit: async function (data) {
+                    var dataSend = {
+                        code: data.categoryCode,
+                        name: data.categoryName
+                    }
+                    await $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(dataSend),
+                        url: '/api/category',
+
+                        success: function (data) {
+                            $("#add-category-modal").hide()
+                            $('#category').append(`<option value="${data.id}">${data.name}</option>`)
+                            $('#category').val(`${data.id}`)
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Lỗi",
+                                text: xhr.responseJSON.message,
+                                icon: "error"
+                            });
+                        }
+                    })
+                }
+            });
+
+            //VALIDATE MATERIAL
+            Validator({
+                form: '#material-form',
+                formGroupSelector: '.form-group',
+                errorSelector: '.error',
+                rules: [
+                    Validator.isRequired('#materialCode', 'Vui lòng nhập mã chất liệu'),
+                    Validator.isRequired('#materialName', 'Vui lòng nhập tên chất liệu'),
+                    Validator.maxLength('#materialName', 30),
+                    Validator.maxLength('#materialCode', 20)
+                ],
+                onSubmit: async function (data) {
+                    var dataSend = {
+                        code: data.materialCode,
+                        name: data.materialName
+                    }
+                    await $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(dataSend),
+                        url: '/api/material',
+
+                        success: function (data) {
+                            $("#add-material-modal").hide()
+                            $('#material').append(`<option value="${data.id}">${data.name}</option>`)
+                            $('#material').val(`${data.id}`)
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Lỗi",
+                                text: xhr.responseJSON.message,
+                                icon: "error"
+                            });
+                        }
+                    })
+                }
+            });
+
+            //VALIDATE MATERIAL
+            Validator({
+                form: '#formProduct1',
+                formGroupSelector: '.form-group',
+                errorSelector: '.error',
+                rules: [
+                    Validator.isRequired('#name', 'Vui lòng nhập tên sản phẩm'),
+                    Validator.maxLength('#name', 100),
+                    Validator.maxLength('#code', 20),
+                    Validator.maxLength('#describe', 300)
+                ]
+            });
+        });
+    </script>
+</div>
+</body>
+</html>
