@@ -1520,7 +1520,7 @@
                     // Xử lý khi pt thanh toán là chuyển khoản
                     if (paymentMethodId == 3) {
                         $(".qr-payment-container").removeClass('hidden');
-                        $(".qr-payment-container").find('img').attr("src", `https://img.vietqr.io/image/TCB-19037422831012-compact2.jpg?amount=${pay.requireMoney}&addInfo=Thanh%20%20toan%20don%20hang&accountName=Nguyen%20Ngoc%20Sang`);
+                        $(".qr-payment-container").find('img').attr("src", `https://img.vietqr.io/image/VCB-9383204822-compact2.jpg?amount=${pay.requireMoney}&addInfo=Thanh%20%20toan%20don%20hang&accountName=Le%20Kim%20Thanh`);
                         dataSendIfChuyenKhoan = dataSend;
                     } else {
                         // Execute the AJAX request directly for other payment methods
@@ -1594,7 +1594,6 @@
                     $(".qr-payment-container").addClass('hidden');
 
                 })
-
                 // Format dạng 1.000
                 function formatNumber(number) {
                     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

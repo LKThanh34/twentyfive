@@ -29,9 +29,10 @@ public class PaymentController {
     @GetMapping("/payment-result")
     public String viewPaymentResult(HttpServletRequest request, Model model) throws UnsupportedEncodingException {
         Map fields = new HashMap();
-        for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
+        for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
             String fieldName = URLEncoder.encode((String) params.nextElement(), StandardCharsets.US_ASCII.toString());
-            String fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
+            String fieldValue = URLEncoder.encode(request.getParameter(fieldName),
+                    StandardCharsets.US_ASCII.toString());
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 fields.put(fieldName, fieldValue);
             }
@@ -55,12 +56,16 @@ public class PaymentController {
 
         model.addAttribute("result", paymentResultDto);
         if (signValue.equals(vnp_SecureHash)) {
-            boolean checkOrderId = paymentRepository.existsByOrderId(paymentResultDto.getTxnRef());   // Giá trị của vnp_TxnRef tồn tại trong CSDL của merchant
+            boolean checkOrderId = paymentRepository.existsByOrderId(paymentResultDto.getTxnRef()); // Giá trị của
+                                                                                                    // vnp_TxnRef tồn
+                                                                                                    // tại trong CSDL
+                                                                                                    // của merchant
             boolean checkAmount = false; // De kiem tra amount
             boolean checkOrderStatus = false; // De kiem tra status co phai la da thanh toan hay khong
             if (checkOrderId) {
                 Payment payment = paymentRepository.findByOrderId(paymentResultDto.getTxnRef());
-                checkAmount = Double.parseDouble(paymentResultDto.getAmount()) == Double.parseDouble(payment.getAmount());
+                checkAmount = Double.parseDouble(paymentResultDto.getAmount()) == Double
+                        .parseDouble(payment.getAmount());
                 checkOrderStatus = payment.getOrderStatus().equals("0");
                 if (checkAmount) {
                     if (checkOrderStatus) {
@@ -73,8 +78,7 @@ public class PaymentController {
                             model.addAttribute("status", "GD Không thành công");
                             model.addAttribute("paymentSuccess", false);
                         }
-                    }
-                    else {
+                    } else {
                         model.addAttribute("status", "Đơn hàng đã được thanh toán");
                         model.addAttribute("paymentSuccess", false);
 

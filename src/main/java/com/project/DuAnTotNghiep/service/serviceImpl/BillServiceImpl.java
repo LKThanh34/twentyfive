@@ -58,13 +58,13 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Page<BillDtoInterface> searchListBill(String maDinhDanh,
-                                                 LocalDateTime ngayTaoStart,
-                                                 LocalDateTime ngayTaoEnd,
-                                                 String trangThai,
-                                                 String loaiDon,
-                                                 String soDienThoai,
-                                                 String hoVaTen,
-                                                 Pageable pageable) {
+            LocalDateTime ngayTaoStart,
+            LocalDateTime ngayTaoEnd,
+            String trangThai,
+            String loaiDon,
+            String soDienThoai,
+            String hoVaTen,
+            Pageable pageable) {
         BillStatus status = null;
         InvoiceType invoiceType = null;
 
@@ -78,18 +78,19 @@ public class BillServiceImpl implements BillService {
         } catch (IllegalArgumentException e) {
 
         }
-        return billRepository.listSearchBill( maDinhDanh,
-                 ngayTaoStart,
-                 ngayTaoEnd,
+        return billRepository.listSearchBill(maDinhDanh,
+                ngayTaoStart,
+                ngayTaoEnd,
                 status,
-                 invoiceType,
-                 soDienThoai,
-                 hoVaTen,
+                invoiceType,
+                soDienThoai,
+                hoVaTen,
                 pageable);
     }
 
     @Override
-    public List<BillDtoInterface> searchListBill(String maDinhDanh, LocalDateTime ngayTaoStart, LocalDateTime ngayTaoEnd, String trangThai, String loaiDon, String soDienThoai, String hoVaTen) {
+    public List<BillDtoInterface> searchListBill(String maDinhDanh, LocalDateTime ngayTaoStart,
+            LocalDateTime ngayTaoEnd, String trangThai, String loaiDon, String soDienThoai, String hoVaTen) {
         BillStatus status = null;
         InvoiceType invoiceType = null;
 
@@ -103,7 +104,7 @@ public class BillServiceImpl implements BillService {
         } catch (IllegalArgumentException e) {
 
         }
-        return billRepository.listSearchBill( maDinhDanh,
+        return billRepository.listSearchBill(maDinhDanh,
                 ngayTaoStart,
                 ngayTaoEnd,
                 status,
@@ -116,17 +117,19 @@ public class BillServiceImpl implements BillService {
     public Bill updateStatus(String status, Long id) {
 
         // Nếu hủy thì cộng lại số lượng tồn
-        if(status.equals("HUY")) {
+        if (status.equals("HUY")) {
             List<BillDetailProduct> billDetailProducts = billRepository.getBillDetailProduct(id);
             billDetailProducts.forEach(item -> {
-                ProductDetail productDetail = productDetailRepository.findById(item.getId()).orElseThrow(() -> new NotFoundException("Không tìm thấy thuộc tính " + item.getId()));
+                ProductDetail productDetail = productDetailRepository.findById(item.getId())
+                        .orElseThrow(() -> new NotFoundException("Không tìm thấy thuộc tính " + item.getId()));
                 int quantityBefore = productDetail.getQuantity();
                 productDetail.setQuantity(quantityBefore + item.getSoLuong());
                 productDetailRepository.save(productDetail);
             });
         }
 
-        Bill bill = billRepository.findById(id).orElseThrow(() -> new NotFoundException("Không tìm thấy bill có mã" + id));
+        Bill bill = billRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bill có mã" + id));
         bill.setStatus(BillStatus.valueOf(status));
         bill.setUpdateDate(LocalDateTime.now());
         return billRepository.save(bill);
@@ -146,7 +149,8 @@ public class BillServiceImpl implements BillService {
             status1 = BillStatus.valueOf(status);
         } catch (IllegalArgumentException e) {
             // Handle the case where the input string does not match any enum constant
-            // You can log an error, return a default value, or perform other error handling here.
+            // You can log an error, return a default value, or perform other error handling
+            // here.
         }
         return billRepository.findAllByStatusAndCustomer_Account_Id(status1, account.getId(), pageable);
     }
@@ -156,7 +160,8 @@ public class BillServiceImpl implements BillService {
         return billRepository.getBillDetailProduct(maHoaDon);
     }
 
-    public void exportToExcel(HttpServletResponse response, Page<BillDtoInterface> bills, String exportUrl) throws IOException {
+    public void exportToExcel(HttpServletResponse response, Page<BillDtoInterface> bills, String exportUrl)
+            throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=bills.xlsx");
 
@@ -258,7 +263,8 @@ public class BillServiceImpl implements BillService {
         response.setContentType("application/pdf");
 
         ITextRenderer renderer = new ITextRenderer();
-        renderer.getFontResolver().addFont("/static/fonts/time-new-roman/SVN-Times New Roman.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        renderer.getFontResolver().addFont("/static/fonts/time-new-roman/SVN-Times New Roman.ttf", BaseFont.IDENTITY_H,
+                BaseFont.EMBEDDED);
 
         String htmlContent = getHtmlContent(maHoaDon);
         renderer.setDocumentFromString(htmlContent);
@@ -295,34 +301,79 @@ public class BillServiceImpl implements BillService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        String htmlContent = "<html xmlns:th=\"http://www.thymeleaf.org\">\n" +
-                "<head>\n" +
-                "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></meta>\n" +
-                "    <title>Hóa đơn bán hàng</title>\n" +
-                "</head>\n" +
-                "<body style=\"font-family: SVN-Times New Roman;\">\n" +
-                "<h1 style=\"text-align: center\">HÓA ĐƠN BÁN HÀNG</h1>\n" +
-                "<h3 style=\"text-align: center\"> Tòa nhà FPT Polytechnic, Cổng số 2, 13 P. Trịnh Văn Bô</h3>\n" +
-                "<h3 style=\"text-align: center\">Xuân Phương, Nam Từ Liêm, Hà Nội</h3>\n\n" +
-                "<h5> Mã hóa đơn: " + billDetailDtoInterface.getMaDinhDanh() + "</h5>\n" +
-                "<h5> Họ và tên: " + customerName + "</h5>\n" +
-                "<h5> Số điện thoại :" + customerPhone + "</h5>\n" +
-                "<h5> Email: " + email + "</h5>\n" +
-                "<h5> Địa chỉ:" + address + "</h5>\n" +
-                "<h5> Ngày thanh toán: " + billDetailDtoInterface.getCreatedDate().format(formatter) + "</h5>\n" +
-                "<h3>Danh sách sản phẩm:</h3>\n" +
-                "<table border=\"1\" style=\"border-collapse: collapse;\">\n" +
-                "<tr>\n" +
-                "<th>Tên sản phẩm</th>\n" +
-                "<th>Màu sắc</th>\n" +
-                "<th>Kích cỡ</th>\n" +
-                "<th>Giá tiền</th>\n" +
-                "<th>Số lượng</th>\n" +
-                "<th>Tổng tiền</th>\n" +
-                "</tr>\n";
+        String htmlContent = "<html>" +
+                "<head>" +
+                "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>" +
+                "<style>" +
+                "body {" +
+                "   font-family: Arial, sans-serif;" +
+                "   width: 300px;" + // phù hợp máy in nhiệt 80mm
+                "   margin: 0 auto;" +
+                "   font-size: 12px;" +
+                "   color: #000;" +
+                "}" +
+                ".center {" +
+                "   text-align: center;" +
+                "}" +
+                ".title {" +
+                "   font-size: 18px;" +
+                "   font-weight: bold;" +
+                "   margin-bottom: 5px;" +
+                "}" +
+                ".info {" +
+                "   margin: 3px 0;" +
+                "}" +
+                "table {" +
+                "   width: 100%;" +
+                "   border-collapse: collapse;" +
+                "   margin-top: 10px;" +
+                "}" +
+                "th, td {" +
+                "   padding: 4px;" +
+                "   text-align: left;" +
+                "   border-bottom: 1px dashed #000;" +
+                "   font-size: 11px;" +
+                "}" +
+                ".total {" +
+                "   font-size: 14px;" +
+                "   font-weight: bold;" +
+                "   margin-top: 10px;" +
+                "}" +
+                ".footer {" +
+                "   text-align: center;" +
+                "   margin-top: 20px;" +
+                "   font-style: italic;" +
+                "}" +
+                "</style>" +
+                "</head>" +
+
+                "<body>" +
+
+                "<div class='center'>" +
+                "<div class='title'>HÓA ĐƠN BÁN HÀNG</div>" +
+                "<div>Twenty Five Store</div>" +
+                "<div>101 Đường Cầu Diễn, Phúc Diễn</div>" +
+                "<div>Bắc Từ Liêm, Hà Nội</div>" +
+                "<div>--------------------------</div>" +
+                "</div>" +
+
+                "<div class='info'><b>Mã HD:</b> " + billDetailDtoInterface.getMaDinhDanh() + "</div>" +
+                "<div class='info'><b>Khách hàng:</b> " + customerName + "</div>" +
+                "<div class='info'><b>SĐT:</b> " + customerPhone + "</div>" +
+                "<div class='info'><b>Email:</b> " + email + "</div>" +
+                "<div class='info'><b>Địa chỉ:</b> " + address + "</div>" +
+                "<div class='info'><b>Ngày:</b> " +
+                billDetailDtoInterface.getCreatedDate().format(formatter) +
+                "</div>" +
+
+                "<table>" +
+                "<tr>" +
+                "<th>Sản phẩm</th>" +
+                "<th>SL</th>" +
+                "<th>TT</th>" +
+                "</tr>";
         Double totalMoney = Double.valueOf(0);
-        for (BillDetailProduct item:
-                billDetailProduct) {
+        for (BillDetailProduct item : billDetailProduct) {
             totalMoney += item.getGiaTien() * item.getSoLuong();
         }
         Locale locale = new Locale("vi", "VN");
@@ -346,8 +397,10 @@ public class BillServiceImpl implements BillService {
         }
         htmlContent += "</table>\n" +
                 "<h5>Tổng tiền: " + currencyFormatter.format(totalMoney) + "</h5>\n" +
-                "<h5>Tiền giảm giá: " + currencyFormatter.format(billDetailDtoInterface.getTienKhuyenMai()) + "</h5>\n" +
-                "<h4>Tổng tiền thanh toán: " + currencyFormatter.format(totalMoney - billDetailDtoInterface.getTienKhuyenMai()) + "</h4>\n" +
+                "<h5>Tiền giảm giá: " + currencyFormatter.format(billDetailDtoInterface.getTienKhuyenMai()) + "</h5>\n"
+                +
+                "<h4>Tổng tiền thanh toán: "
+                + currencyFormatter.format(totalMoney - billDetailDtoInterface.getTienKhuyenMai()) + "</h4>\n" +
                 "</body>\n" +
                 "</html>";
         return htmlContent;
@@ -384,7 +437,7 @@ public class BillServiceImpl implements BillService {
         billDto.setStatus(bill.getStatus());
         billDto.setUpdateDate(bill.getUpdateDate());
         CustomerDto customer = new CustomerDto();
-        if(bill.getCustomer() != null) {
+        if (bill.getCustomer() != null) {
             customer.setName(bill.getCustomer().getName());
             customer.setId(bill.getCustomer().getId());
             customer.setCode(bill.getCustomer().getCode());
@@ -392,8 +445,7 @@ public class BillServiceImpl implements BillService {
         }
         billDto.setCustomer(customer);
         Double total = Double.valueOf(0);
-        for (BillDetail billDetail:
-             bill.getBillDetail()) {
+        for (BillDetail billDetail : bill.getBillDetail()) {
             total += billDetail.getQuantity() * billDetail.getMomentPrice();
         }
         billDto.setTotalAmount(total);
